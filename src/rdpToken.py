@@ -1,145 +1,171 @@
 # =============================================================================
 # Refinitiv Data Platform demo app to get OAuth tokens
 # =============================================================================
+
+# Import the required libraries for HTTP/JSON operations
 import requests
 import json
 import time
 
-# User Variables
-USERNAME = ""
-PASSWORD = ""
-CLIENT_ID = ""
-UUID = ""					# required for research alerts subscription
+# Authentication objects
+auth_obj = None
 
-# Application Constants
-EDP_version = "/v1"
-base_URL = "https://api.refinitiv.com"
-category_URL = "/auth/oauth2"
-endpoint_URL = "/token"
-CLIENT_SECRET = ""
-TOKEN_FILE = "token.txt"
-SCOPE = "trapi.messenger"
+# Authentication Variables
+_username = 'XXXXXX'
+_password = 'XXXXXX'
+_app_key = 'XXXXXX'
 
 
-TOKEN_ENDPOINT = base_URL + category_URL + EDP_version + endpoint_URL
+class rdpToken:
+    # Authentication Variables
+    username = ''
+    password = ''
+    app_key = ''
 
-# =============================================================================
+    # RDP Authentication Service Detail
+    rdp_authen_version = "/v1"
+    base_URL = "https://api.refinitiv.com"
+    category_URL = "/auth/oauth2"
+    endpoint_URL = "/token"
+    client_secret = ""
+    token_file = "./token.txt"
+    scope = "trapi.messenger"
 
+    # Create RDP Authentication service URL
+    authen_URL = base_URL + category_URL + rdp_authen_version + endpoint_URL
 
-def _requestNewToken(refreshToken):
-    if refreshToken is None:
-        authenRequest = {
-            "username": USERNAME,
-            "password": PASSWORD,
+    def __init__(self, username, password, app_key):
+        self.username = username
+        self.password = password
+        self.app_key = app_key
+
+    # Create new RDP Authentication request message and send it to RDP service
+    def request_new_token(self, refresh_token):
+
+        # Create request message
+        if not refresh_token:
+            authen_request_msg = {
+                "username": self.username,
+                "password": self.password,
+                "client_id":  self.app_key,
+                "grant_type": "password",
+                "scope": self.scope,
+                "takeExclusiveSignOnControl": "true"
+            }
+        else:
+            authen_request_msg = {
+                "refresh_token": refresh_token,
+                "username": self.username,
+                "grant_type": "refresh_token",
+            }
+        response = None
+
+        try:
+            # Send request message to RDP with Python requests module
+            response = requests.post(self.authen_URL,
+                                     headers={'Accept': 'application/json'},
+                                     data=authen_request_msg,
+                                     auth=(
+                                         self.app_key,
+                                         self.client_secret
+                                     ))
+        except requests.exceptions.RequestException as e:
+            print('RDP authentication exception failure:', e)
+
+        if response.status_code == 200:
+            print('Authenticaion success')
+        else:  # Handle HTTP error
+            print('RDP authentication result failure:',
+                  response.status_code, response.reason)
+            print('Text:', response.text)
+            # both access and refresh tokens are expired
+            if response.status_code == 400 and response.json()['error'] == 'invalid_grant':
+                print('Both Access Token and Refresh Token are expired')
+                raise Exception("Both Access Token and Refresh Token are expired {0} - {1}"
+                                .format(response.status_code, response.text))
+        return response.status_code, response.json()
+
+    # Create new RDP Change Password request message and send it to RDP service
+    def change_password(_username, old_password, client_id, new_password):
+
+        # Create request message
+        change_password_req_msg = {
             "grant_type": "password",
-            "client_id": CLIENT_ID,
-            "scope": SCOPE,
+            "username": _username,
+            "password": old_password,
+            "newPassword": new_password,
+            "scope": scope,
             "takeExclusiveSignOnControl": "true"
         }
-    else:
-        authenRequest = {
-            "refresh_token": refreshToken,
-            "username": USERNAME,
-            "grant_type": "refresh_token",
-        }
 
-    # Make a REST call to get latest access token
-    response = requests.post(
-        TOKEN_ENDPOINT,
-        headers={
-            "Accept": "application/json"
-        },
-        data=authenRequest,
-        auth=(
-            CLIENT_ID,
-            CLIENT_SECRET
-        )
-    )
+        try:
+            response = requests.post(self.authen_URL,
+                                     headers={
+                                         'Accept': 'application/json'},
+                                     data=authen_request_msg,
+                                     auth=(
+                                         app_key,
+                                         client_secret
+                                     ))
+        except requests.exceptions.RequestException as e:
+            print('RDP Change Password exception failure:', e)
 
-    if response.status_code != 200:
-        raise Exception(
-            "Failed to get access token {0} - {1}".format(response.status_code, response.text))
+        if response.status_code == 200:
+            print('Change Password success')
+            self.save_authen_to_file(response.json())
+        else:
+            print('RDP Change Password result failure:',
+                  response.status_code, response.reason)
+            print('Text:', response.text)
 
-    # Return the new token
-    return json.loads(response.text)
+        return response.status_code, response.json()
 
+    # Save RDP Authentication information (Access Token, Refresh Token and Expire time) into the file
+    def save_authen_to_file(self, _authen_obj):
+        with open(self.token_file, 'w') as saved_token:  # Open './token.txt' file
+            print('Saving Authentication information to file')
+            _authen_obj['expires_tm'] = time.time(
+            ) + int(_authen_obj['expires_in']) - 10
+            json.dump(_authen_obj, saved_token, indent=4)
 
-# =============================================================================
-def changePassword(user, oldPass, clientID, newPass):
-    tData = {
-        "username": user,
-        "password": oldPass,
-        "grant_type": "password",
-        "scope": SCOPE,
-        "takeExclusiveSignOnControl": "true",
-        "newPassword": newPass
-    }
+    # Get RDP Authentication Token from './token.txt' file first.
+    # If token expire or not exist, request a new token
+    def get_token(self):
+        try:
+            with open(self.token_file, 'r+') as saved_token:  # Open './token.txt' file
+                auth_obj = json.load(saved_token)
+                if auth_obj['expires_tm'] > time.time():
+                    return auth_obj
 
-    # Make a REST call to get latest access token
-    response = requests.post(
-        TOKEN_ENDPOINT,
-        headers={
-            "Accept": "application/json"
-        },
-        data=tData,
-        auth=(
-            clientID,
-            CLIENT_SECRET
-        )
-    )
+            print('Token expired, request a new Token with refresh token')
+            status, auth_obj = self.request_new_token(
+                auth_obj['refresh_token'])
+        except IOError as e:
+            print(e)
+            print('None Token found, requesting a new one')
+            status, auth_obj = self.request_new_token(None)
+        except json.JSONDecodeError as json_error:
+            print(json_error)
+            print('None Token found, requesting a new one')
+            status, auth_obj = self.request_new_token(None)
+        except:
+            print("Getting a new token...")
+            status, auth_obj = self.request_new_token(None)
 
-    if response.status_code != 200:
-        raise Exception(
-            "Failed to change password {0} - {1}".format(response.status_code, response.text))
-
-    tknObject = json.loads(response.text)
-    # Persist this token for future queries
-    saveToken(tknObject)
-    # Return access token
-    return tknObject["access_token"]
-
-
-# =============================================================================
-def saveToken(tknObject):
-    tf = open(TOKEN_FILE, "w")
-    print("Saving the new token")
-    # Append the expiry time to token
-    tknObject["expiry_tm"] = time.time() + int(tknObject["expires_in"]) - 10
-    # Store it in the file
-    json.dump(tknObject, tf, indent=4)
+        if status == 200:
+            self.save_authen_to_file(auth_obj)
+            return auth_obj
+        else:
+            return None
 
 
 # =============================================================================
-def getToken():
-    try:
-        print("Reading the token from: " + TOKEN_FILE)
-        # Read the token from a file
-        tf = open(TOKEN_FILE, "r+")
-        tknObject = json.load(tf)
+if __name__ == '__main__':
+    print('Getting RDP Authentication Token')
 
-        # Is access token valid
-        if tknObject["expiry_tm"] > time.time():
-            # return access token
-            return tknObject["access_token"]
-
-        print("Token expired, refreshing a new one...")
-        tf.close()
-        # Get a new token from refresh token
-        tknObject = _requestNewToken(tknObject["refresh_token"])
-
-    except:
-        print("Getting a new token...")
-        tknObject = _requestNewToken(None)
-
-    # Persist this token for future queries
-    saveToken(tknObject)
-    # Return access token
-    return tknObject["access_token"]
-
-
-# =============================================================================
-if __name__ == "__main__":
-    # Get latest access token
-    print("Getting OAuth access token...")
-    accessToken = getToken()
-    print("Have token now")
+    rdp_token = rdpToken(_username, _password, _app_key)
+    auth_obj = rdp_token.get_token()
+    if auth_obj:
+        print('access token = %s' % auth_obj['access_token'])
+        print('refresh token = %s' % auth_obj['refresh_token'])
+        print('expires_in = %s' % auth_obj['expires_in'])

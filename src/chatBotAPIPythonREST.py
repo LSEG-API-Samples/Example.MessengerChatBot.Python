@@ -1,26 +1,30 @@
 import requests
 import json
 import sys
-from rdpToken import rdpToken
+# from rdpToken import rdpToken
+from rdpToken import RDPTokenManagement
 
+# Input your Bot Username
+bot_username = 'XXXXX'
+# Input Bot Password
+bot_password = 'XXXXX'
 # Input your Messenger account AppKey.
-bot_username = ''  # Input your Bot Username
-bot_password = ''  # Input Bot Password
-bot_app_key = ''
+bot_app_key = 'XXXXX'
 
 # Authentication objects
 auth_token = None
 rdp_token = None
 
+chatroom_id = None
 
-def connect():
-    global rdp_token
-    auth_token = rdp_token.get_token()
+
+def connect(rdp_token_object):
+    # global rdp_token
+    auth_token = rdp_token_object.get_token()
     return auth_token
 
 
-def list_chatrooms(room_is_managed=False):
-    global auth_token
+def list_chatrooms(access_token, room_is_managed=False):
 
     if room_is_managed:
         url = 'https://api.refinitiv.com/messenger/beta1/managed_chatrooms'
@@ -28,22 +32,87 @@ def list_chatrooms(room_is_managed=False):
         url = 'https://api.refinitiv.com/messenger/beta1/chatrooms'
 
     headers = {'Accept': 'application/json',
-               'Authorization': 'Bearer {}'.format(auth_token['access_token'])}
+               'Authorization': 'Bearer {}'.format(access_token)}
     response = None
     try:
         # Send request message to RDP with Python requests module
         response = requests.get(url, headers=headers)
     except requests.exceptions.RequestException as e:
-        print('RDP authentication exception failure:', e)
+        print('Messenger BOT API: List Chatroom exception failure:', e)
 
-    if response.status_code == 200:
-        print('Messenger BOT API get chatroom  success')
+    if response.status_code == 200:  # HTTP Status 'OK'
+        print('Messenger BOT API: get chatroom  success')
     else:
-        print('Messenger BOT API get chatroom result failure:',
+        print('Messenger BOT API: get chatroom result failure:',
               response.status_code, response.reason)
         print('Text:', response.text)
 
     return response.status_code, response.json()
+
+
+def join_chatroom(access_token, room_id=None, room_is_managed=False):
+    joined_rooms = []
+    if room_is_managed:
+        url = 'https://api.refinitiv.com/messenger/beta1/managed_chatrooms/{}/join'.format(
+            room_id)
+    else:
+        url = 'https://api.refinitiv.com/messenger/beta1/chatrooms/{}/join'.format(
+            room_id)
+
+    headers = {'Accept': 'application/json',
+               'Authorization': 'Bearer {}'.format(access_token)}
+
+    response = None
+    try:
+        # Send request message to RDP with Python requests module
+        response = requests.post(url, headers=headers)
+    except requests.exceptions.RequestException as e:
+        print('Messenger BOT API: join chatroom exception failure:', e)
+
+    if response.status_code == 200:  # HTTP Status 'OK'
+        joined_rooms.append(room_id)
+        print('Messenger BOT API: join chatroom success')
+    else:
+        print('Messenger BOT API: join chatroom result failure:',
+              response.status_code, response.reason)
+        print('Text:', response.text)
+
+    return joined_rooms
+
+
+def post_message_to_chatroom(access_token,  joined_rooms, room_id=None,  text='', room_is_managed=False):
+    if room_id not in joined_rooms:
+        joined_rooms = join_chatroom(access_token, room_id, room_is_managed)
+
+    if joined_rooms:
+        if room_is_managed:
+            url = 'https://api.refinitiv.com/messenger/beta1/managed_chatrooms/{}/post'.format(
+                room_id)
+        else:
+            url = 'https://api.refinitiv.com/messenger/beta1/chatrooms/{}/post'.format(
+                room_id)
+
+        headers = {'Accept': 'application/json',
+                   'Authorization': 'Bearer {}'.format(access_token)}
+        body = {
+            "message": text
+        }
+
+        response = None
+        try:
+            response = requests.post(
+                url=url, data=json.dumps(body), headers=headers)
+        except requests.exceptions.RequestException as e:
+            print('Messenger BOT API: post message to exception failure:', e)
+
+        if response.status_code == 200:  # HTTP Status 'OK'
+            joined_rooms.append(room_id)
+            print('Messenger BOT API: post message to chatroom success')
+        else:
+            print('Messenger BOT API: post message to failure:',
+                  response.status_code, response.reason)
+            print('Text:', response.text)
+    pass
 
 # =============================================================================
 
@@ -51,14 +120,30 @@ def list_chatrooms(room_is_managed=False):
 if __name__ == '__main__':
     print('Getting RDP Authentication Token')
 
-    rdp_token = rdpToken(bot_username, bot_password, bot_app_key)
-    auth_token = connect()
+    rdp_token = RDPTokenManagement(bot_username, bot_password, bot_app_key)
+    # auth_token = connect()
+    auth_token = connect(rdp_token)
 
     if not auth_token:
         sys.exit(1)
     print('Successfully Authenticated ')
 
+    access_token = auth_token['access_token']
+
     print('Get Rooms ')
-    status, chatroomId = list_chatrooms()
-    print(json.dumps(chatroomId, sort_keys=True,
-                     indent=2, separators=(',', ':')))
+    status, chatroom_respone = list_chatrooms(access_token)
+
+    # print(json.dumps(chatroom_respone, sort_keys=True,indent=2, separators=(',', ':')))
+
+    chatroom_id = chatroom_respone["chatrooms"][0]["chatroomId"]
+    # print('Chatroom ID is ', chatroom_id)
+
+    print('Join Rooms ')
+    joined_rooms = join_chatroom(access_token, chatroom_id)
+    # print('joined_rooms is ', joined_rooms)
+
+    if joined_rooms:
+        text_to_post = 'Hello from Python'
+        print('sending message to {%s} Rooms ' % (chatroom_id))
+        post_message_to_chatroom(
+            access_token, joined_rooms, chatroom_id, text_to_post)

@@ -16,7 +16,7 @@ _password = 'XXXXXX'
 _app_key = 'XXXXXX'
 
 
-class rdpToken:
+class RDPTokenManagement:
     # Authentication Variables
     username = ''
     password = ''

@@ -3,9 +3,9 @@ import json
 import sys
 from rdpToken import rdpToken
 
-# Authentication Variables
-bot_username = ''
-bot_password = ''
+# Input your Messenger account AppKey.
+bot_username = ''  # Input your Bot Username
+bot_password = ''  # Input Bot Password
 bot_app_key = ''
 
 # Authentication objects

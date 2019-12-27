@@ -72,7 +72,7 @@ class rdpToken:
         except requests.exceptions.RequestException as e:
             print('RDP authentication exception failure:', e)
 
-        if response.status_code == 200:
+        if response.status_code == 200:  # HTTP Status 'OK'
             print('Authenticaion success')
         else:  # Handle HTTP error
             print('RDP authentication result failure:',
@@ -110,7 +110,7 @@ class rdpToken:
         except requests.exceptions.RequestException as e:
             print('RDP Change Password exception failure:', e)
 
-        if response.status_code == 200:
+        if response.status_code == 200:  # HTTP Status 'OK'
             print('Change Password success')
             self.save_authen_to_file(response.json())
         else:
@@ -131,28 +131,33 @@ class rdpToken:
     # Get RDP Authentication Token from './token.txt' file first.
     # If token expire or not exist, request a new token
     def get_token(self):
+        is_request_error = False
         try:
             with open(self.token_file, 'r+') as saved_token:  # Open './token.txt' file
                 auth_obj = json.load(saved_token)
-                if auth_obj['expires_tm'] > time.time():
+                if auth_obj['expires_tm'] > time.time():  # Access Token is still active
                     return auth_obj
 
+            # Access Token expire
             print('Token expired, request a new Token with refresh token')
             status, auth_obj = self.request_new_token(
                 auth_obj['refresh_token'])
         except IOError as e:
             print(e)
             print('None Token found, requesting a new one')
-            status, auth_obj = self.request_new_token(None)
+            is_request_error = True
         except json.JSONDecodeError as json_error:
             print(json_error)
             print('None Token found, requesting a new one')
-            status, auth_obj = self.request_new_token(None)
+            is_request_error = True
         except:
             print("Getting a new token...")
+            is_request_error = True
+
+        if is_request_error:  # if first request returns error, re-request RDP Access Token
             status, auth_obj = self.request_new_token(None)
 
-        if status == 200:
+        if status == 200:  # HTTP Status 'OK'
             self.save_authen_to_file(auth_obj)
             return auth_obj
         else:

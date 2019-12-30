@@ -1,6 +1,13 @@
-# =============================================================================
-# Refinitiv Data Platform demo app to get OAuth tokens
-# =============================================================================
+# |-----------------------------------------------------------------------------
+# |            This source code is provided under the Apache 2.0 license      --
+# |  and is provided AS IS with no warranty or guarantee of fit for purpose.  --
+# |                See the project's LICENSE.md for details.                  --
+# |           Copyright Refinitiv 2020. All rights reserved.                  --
+# |-----------------------------------------------------------------------------
+
+# |-----------------------------------------------------------------------------
+# |            Refinitiv Data Platform demo app to get OAuth tokens           --
+# |-----------------------------------------------------------------------------
 
 # Import the required libraries for HTTP/JSON operations
 import requests

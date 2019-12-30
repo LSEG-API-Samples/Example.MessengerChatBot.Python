@@ -49,7 +49,7 @@ class RDPTokenManagement:
     # Create new RDP Authentication request message and send it to RDP service
     def request_new_token(self, refresh_token):
 
-        # Create request message
+        # Create a request message
         if not refresh_token:
             authen_request_msg = {
                 "username": self.username,

@@ -19,7 +19,7 @@ bot_username = 'XXXXX'
 # Input Bot Password
 bot_password = 'XXXXX'
 # Input your Messenger account AppKey.
-bot_app_key = 'XXXXX'
+app_key = 'XXXXX'
 
 # Authentication objects
 auth_token = None
@@ -45,7 +45,7 @@ def list_chatrooms(access_token, room_is_managed=False):
                'Authorization': 'Bearer {}'.format(access_token)}
     response = None
     try:
-        # Send request message to RDP with Python requests module
+        # Send a HTTP request message with Python requests module
         response = requests.get(url, headers=headers)
     except requests.exceptions.RequestException as e:
         print('Messenger BOT API: List Chatroom exception failure:', e)
@@ -74,7 +74,7 @@ def join_chatroom(access_token, room_id=None, room_is_managed=False):  # Join ch
 
     response = None
     try:
-        # Send request message to RDP with Python requests module
+        # Send a HTTP request message with Python requests module
         response = requests.post(url, headers=headers)
     except requests.exceptions.RequestException as e:
         print('Messenger BOT API: join chatroom exception failure:', e)
@@ -112,7 +112,7 @@ def post_message_to_chatroom(access_token,  joined_rooms, room_id=None,  text=''
         response = None
         try:
             response = requests.post(
-                url=url, data=json.dumps(body), headers=headers)
+                url=url, data=json.dumps(body), headers=headers)  # Send a HTTP request message with Python requests module
         except requests.exceptions.RequestException as e:
             print('Messenger BOT API: post message to exception failure:', e)
 
@@ -142,6 +142,7 @@ def leave_chatroom(access_token, joined_rooms, room_id=None, room_is_managed=Fal
 
         response = None
         try:
+            # Send a HTTP request message with Python requests module
             response = requests.post(url, headers=headers)
         except requests.exceptions.RequestException as e:
             print('Messenger BOT API: leave chatroom exception failure:', e)
@@ -164,7 +165,7 @@ if __name__ == '__main__':
     print('Getting RDP Authentication Token')
 
     # Create and initiate RDPTokenManagement object
-    rdp_token = RDPTokenManagement(bot_username, bot_password, bot_app_key)
+    rdp_token = RDPTokenManagement(bot_username, bot_password, app_key)
 
     # Authenticate with RDP Token service
     auth_token = authen_rdp(rdp_token)

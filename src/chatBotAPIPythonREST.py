@@ -15,11 +15,11 @@ import sys
 from rdpToken import RDPTokenManagement
 
 # Input your Bot Username
-bot_username = ''
+bot_username = 'XXXXX'
 # Input Bot Password
-bot_password = ''
+bot_password = 'XXXXX'
 # Input your Messenger account AppKey.
-bot_app_key = ''
+bot_app_key = 'XXXXX'
 
 # Authentication objects
 auth_token = None

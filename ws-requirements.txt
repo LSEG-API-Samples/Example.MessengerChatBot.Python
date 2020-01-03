@@ -1,0 +1,9 @@
+autopep8==1.4.4
+certifi==2019.11.28
+chardet==3.0.4
+idna==2.8
+pycodestyle==2.5.0
+requests==2.22.0
+six==1.13.0
+urllib3==1.25.7
+websocket-client==0.57.0

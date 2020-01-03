@@ -17,6 +17,7 @@ import socket
 import json
 import websocket
 import threading
+import random
 from rdpToken import RDPTokenManagement
 
 # Input your Bot Username
@@ -31,6 +32,8 @@ auth_token = None
 rdp_token = None
 
 chatroom_id = None
+
+expire_time = 0
 
 # Please verify below URL is correct via the WS lookup
 ws_url = "wss://api.collab.refinitiv.com/services/nt/api/messenger/v1/stream"
@@ -189,6 +192,26 @@ def on_close(_):
 def on_open(_):
     """ Called when handshake is complete and websocket is open, send login """
     print("WebSocket successfully connected!")
+    send_ws_connect_request(auth_token['access_token'])
+
+
+def send_ws_connect_request(access_token):
+
+    random.seed(1)
+
+    connect_request_msg = {
+        'reqId': str(random.randint(0, 1000000)),
+        'command': 'connect',
+        'payload': {
+            'stsToken': access_token
+        }
+    }
+    web_socket_app.send(json.dumps(connect_request_msg))
+    print("SENT:")
+    print(json.dumps(
+        connect_request_msg,
+        sort_keys=True,
+        indent=2, separators=(',', ':')))
 
 
 # =============================== Main Process ========================================
@@ -208,7 +231,7 @@ if __name__ == '__main__':
     print('Successfully Authenticated ')
 
     access_token = auth_token['access_token']
-
+    expire_time = auth_token['expires_in']
     # List associated Chatrooms
     print('Get Rooms ')
     status, chatroom_respone = list_chatrooms(access_token)
@@ -241,3 +264,21 @@ if __name__ == '__main__':
         target=web_socket_app.run_forever,
         kwargs={'sslopt': {'check_hostname': False}})
     wst.start()
+
+    try:
+        while True:
+            # Give 30 seconds to obtain the new security token and send reissue
+            if int(expire_time) > 30:
+                time.sleep(int(expire_time) - 30)
+            else:
+                # Fail the refresh since value too small
+                sys.exit(1)
+            #sts_token, refresh_token, expire_time = get_sts_token( refresh_token)
+            if not sts_token:
+                sys.exit(1)
+
+            # Update token.
+            # if logged_in:
+            #    send_login_request(sts_token, True)
+    except KeyboardInterrupt:
+        web_socket_app.close()

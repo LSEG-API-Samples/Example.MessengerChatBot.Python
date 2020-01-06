@@ -73,21 +73,26 @@ Once you have setup your Eikon Messenger user and Bot user, you can add the Bot 
 ## <a id="running-rest"></a>Running the REST API demo application
 1. Unzip or download the tutorial project folder into a directory of your choice 
 2. Run ```$> pip install -r rest-requestments.txt``` command in a console to install all the dependencies libraries.
-3. You will then be able to send messages to chatrooms using the API calls
-4. Open the *chatBotAPIPythonREST.py** demo application source code with your editor and input the following parameters
+3. Open the *chatBotAPIPythonREST.py** demo application source code with your editor and input the following parameters
     - ```app_key```: Your AppKey
     - ```bot_username```: Your Bot username
     - ```bot_password```: Your Bot password
-5. Open a command prompt and folder *src* and run the demo application with the following command.
+    - ```recipient_email``` : Your assoicate Eikon message email address 
+4. Open a command prompt and folder *src* and run the demo application with the following command.
     ```
     $>python chatBotAPIPythonREST.py
     ```
-6. The application then authenticates with [RDP](https://developers.refinitiv.com/refinitiv-data-platform) Authentication service, gets an associate Chatroom and joining to that Chatroom.
+5. The application then authenticates with [RDP](https://developers.refinitiv.com/refinitiv-data-platform) Authentication service and sends a 1-1 message to your assoicate Eikon message email address. 
     ```
     Getting RDP Authentication Token
 
     Saving Authentication information to file
     Successfully Authenticated
+    send 1 to 1 message to <email>
+    Messenger BOT API: post a 1 to 1 message to <email> success
+    ```
+6. Then a demo gets an associate Chatroom and joining to that Chatroom.
+    ```
     Get Rooms
     Messenger BOT API: get chatroom  success
     Join Rooms

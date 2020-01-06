@@ -20,6 +20,8 @@ bot_username = 'XXXXX'
 bot_password = 'XXXXX'
 # Input your Messenger account AppKey.
 app_key = 'XXXXX'
+# Input your Eikon Messenger account email
+recipient_email = 'XXXXX'
 
 # Authentication objects
 auth_token = None
@@ -90,6 +92,33 @@ def join_chatroom(access_token, room_id=None, room_is_managed=False):  # Join ch
     return joined_rooms
 
 
+# send 1 to 1 message to recipient email directly without a Chatroom via BOT
+def post_direct_message(access_token, contact_email='', text=''):
+    url = 'https://api.refinitiv.com/messenger/beta1/message'
+
+    headers = {'Accept': 'application/json',
+               'Authorization': 'Bearer {}'.format(access_token)}
+
+    body = {
+        'recipientEmail': contact_email,
+        'message': text
+    }
+    try:
+        # Send a HTTP request message with Python requests module
+        response = requests.post(
+            url=url, data=json.dumps(body), headers=headers)
+    except requests.exceptions.RequestException as e:
+        print('Messenger BOT API: post a 1 to 1 message exception failure:', e)
+
+    if response.status_code == 200:  # HTTP Status 'OK'
+        print('Messenger BOT API: post a 1 to 1 message to %s success' %
+              (contact_email))
+    else:
+        print('Messenger BOT API: post a 1 to 1 message failure:',
+              response.status_code, response.reason)
+        print('Text:', response.text)
+
+
 # Posting Messages to a Chatroom via HTTP REST
 def post_message_to_chatroom(access_token,  joined_rooms, room_id=None,  text='', room_is_managed=False):
     if room_id not in joined_rooms:
@@ -114,7 +143,7 @@ def post_message_to_chatroom(access_token,  joined_rooms, room_id=None,  text=''
             response = requests.post(
                 url=url, data=json.dumps(body), headers=headers)  # Send a HTTP request message with Python requests module
         except requests.exceptions.RequestException as e:
-            print('Messenger BOT API: post message to exception failure:', e)
+            print('Messenger BOT API: post message exception failure:', e)
 
         if response.status_code == 200:  # HTTP Status 'OK'
             joined_rooms.append(room_id)
@@ -176,6 +205,13 @@ if __name__ == '__main__':
     print('Successfully Authenticated ')
 
     access_token = auth_token['access_token']
+
+    # Send 1 to 1 message to reipient without a chat room
+    text_to_post = """
+    USD BBL EU AM Assessment at 11:30 UKT\nName\tAsmt\t10-Apr-19\tFair Value\t10-Apr-19\tHst Cls\nBRT Sw APR19\t70.58\t05:07\t(up) 71.04\t10:58\t70.58\nBRTSw MAY19\t70.13\t05:07\t(dn) 70.59\t10:58\t70.14\nBRT Sw JUN19\t69.75\t05:07\t(up)70.2\t10:58\t69.76
+    """
+    print('send 1 to 1 message to %s ' % (recipient_email))
+    post_direct_message(access_token, recipient_email, text_to_post)
 
     # List associated Chatrooms
     print('Get Rooms ')

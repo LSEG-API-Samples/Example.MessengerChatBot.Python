@@ -34,6 +34,7 @@ rdp_token = None
 chatroom_id = None
 
 expire_time = 0
+joined_rooms = None
 
 # Please verify below URL is correct via the WS lookup
 ws_url = "wss://api.collab.refinitiv.com/services/nt/api/messenger/v1/stream"
@@ -177,6 +178,7 @@ def on_message(_, message):
     print("RECEIVED: ")
     message_json = json.loads(message)
     print(json.dumps(message_json, sort_keys=True, indent=2, separators=(',', ':')))
+    process_message(message_json)
 
 
 def on_error(_, error):
@@ -212,6 +214,22 @@ def send_ws_connect_request(access_token):
         connect_request_msg,
         sort_keys=True,
         indent=2, separators=(',', ':')))
+
+
+def process_message(message_json):
+    #print('Process Message')
+    message_event = message_json['event']
+    #print('event = ', message_event)
+    if message_event == 'chatroomPost':
+        try:
+            incoming_msg = message_json['post']['message']
+            if incoming_msg == "/help" or incoming_msg == "C1" or incoming_msg == "C2" or incoming_msg == "C3":
+                post_message_to_chatroom(
+                    auth_token['access_token'], joined_rooms, chatroom_id, 'What would you like help with?\n ')
+            else:
+                print('Receive message = ', incoming_msg)
+        except Exception as error:
+            print('Post meesage to a Chatroom fail :', error)
 
 
 # =============================== Main Process ========================================

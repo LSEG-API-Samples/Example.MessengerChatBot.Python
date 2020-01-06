@@ -36,13 +36,19 @@ chatroom_id = None
 expire_time = 0
 joined_rooms = None
 
+logged_in = False
+
 # Please verify below URL is correct via the WS lookup
 ws_url = "wss://api.collab.refinitiv.com/services/nt/api/messenger/v1/stream"
 
 
 def authen_rdp(rdp_token_object):  # Call RDPTokenManagement to get authentication
     auth_token = rdp_token_object.get_token()
-    return auth_token
+    if auth_token:
+        return auth_token, True
+    else:
+        return None, False
+    # return auth_token
 
 
 # Get List of Chatrooms Function via HTTP REST
@@ -197,13 +203,33 @@ def on_open(_):
     send_ws_connect_request(auth_token['access_token'])
 
 
+# Send a connection request to Messenger ChatBot API WebSocket server
 def send_ws_connect_request(access_token):
-
+    # set initial point for Python Random module
     random.seed(1)
-
+    # create connection request message in JSON format
     connect_request_msg = {
         'reqId': str(random.randint(0, 1000000)),
         'command': 'connect',
+        'payload': {
+            'stsToken': access_token
+        }
+    }
+    web_socket_app.send(json.dumps(connect_request_msg))
+    print("SENT:")
+    print(json.dumps(
+        connect_request_msg,
+        sort_keys=True,
+        indent=2, separators=(',', ':')))
+
+
+def send_ws_keepalive(access_token):
+    # set initial point for Python Random module
+    random.seed(1)
+    # create connection request message in JSON format
+    connect_request_msg = {
+        'reqId': str(random.randint(0, 1000000)),
+        'command': 'authenticate',
         'payload': {
             'stsToken': access_token
         }
@@ -237,12 +263,13 @@ def process_message(message_json):
 if __name__ == '__main__':
     print('Getting RDP Authentication Token')
 
+    #print('logged_in = ', logged_in)
     # Create and initiate RDPTokenManagement object
     rdp_token = RDPTokenManagement(bot_username, bot_password, app_key)
 
     # Authenticate with RDP Token service
-    auth_token = authen_rdp(rdp_token)
-
+    auth_token, logged_in = authen_rdp(rdp_token)
+    #print('auth_token, logged_in = authen_rdp(rdp_token) logged_in = ', logged_in)
     if not auth_token:
         sys.exit(1)
 
@@ -292,11 +319,13 @@ if __name__ == '__main__':
                 # Fail the refresh since value too small
                 sys.exit(1)
             #sts_token, refresh_token, expire_time = get_sts_token( refresh_token)
-            if not sts_token:
+            print('Refresh Token ')
+            auth_token, logged_in = authen_rdp(rdp_token)
+            if not auth_token:
                 sys.exit(1)
 
             # Update token.
-            # if logged_in:
-            #    send_login_request(sts_token, True)
+            if logged_in:
+                send_ws_keepalive(access_token)
     except KeyboardInterrupt:
         web_socket_app.close()

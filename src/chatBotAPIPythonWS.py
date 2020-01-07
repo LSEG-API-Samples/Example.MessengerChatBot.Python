@@ -247,8 +247,14 @@ def process_message(message_json):
             if incoming_msg == "/help" or incoming_msg == "C1" or incoming_msg == "C2" or incoming_msg == "C3":
                 post_message_to_chatroom(
                     access_token, joined_rooms, chatroom_id, 'What would you like help with?\n ')
-            # else:
-                #print('receive message : ', incoming_msg)
+            elif incoming_msg == "/complex_message":
+                # Sending tabular data, hyperlinks and a full set of emoji in a message to a Chatroom
+                complex_msg = """
+                USD BBL EU AM Assessment at 11:30 UKT\nName\tAsmt\t10-Apr-19\tFair Value\t10-Apr-19\tHst Cls\nBRT Sw APR19\t70.58\t05:07\t(up) 71.04\t10:58\t70.58\nBRTSw MAY19\t70.13\t05:07\t(dn) 70.59\t10:58\t70.14\nBRT Sw JUN19\t69.75\t05:07\t(up)70.2\t10:58\t69.76
+                """
+                post_message_to_chatroom(
+                    access_token, joined_rooms, chatroom_id, complex_msg)
+
         except Exception as error:
             print('Post meesage to a Chatroom fail :', error)
 

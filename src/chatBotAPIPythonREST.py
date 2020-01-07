@@ -32,7 +32,7 @@ chatroom_id = None
 
 def authen_rdp(rdp_token_object):  # Call RDPTokenManagement to get authentication
     auth_token = rdp_token_object.get_token()
-    return auth_token
+    return auth_token['access_token']
 
 
 # Get List of Chatrooms Function via HTTP REST
@@ -197,14 +197,12 @@ if __name__ == '__main__':
     rdp_token = RDPTokenManagement(bot_username, bot_password, app_key)
 
     # Authenticate with RDP Token service
-    auth_token = authen_rdp(rdp_token)
+    access_token = authen_rdp(rdp_token)
 
-    if not auth_token:
+    if not access_token:
         sys.exit(1)
 
     print('Successfully Authenticated ')
-
-    access_token = auth_token['access_token']
 
     # Send 1 to 1 message to reipient without a chat room
     text_to_post = """

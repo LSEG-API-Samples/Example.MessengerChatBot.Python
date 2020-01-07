@@ -77,7 +77,7 @@ Once you have setup your Eikon Messenger user and Bot user, you can add the Bot 
     - ```app_key```: Your AppKey
     - ```bot_username```: Your Bot username
     - ```bot_password```: Your Bot password
-    - ```recipient_email``` : Your assoicate Eikon message email address 
+    - ```recipient_email``` : Your assoicate Eikon messenger email address 
 4. Open a command prompt and folder *src* and run the demo application with the following command.
     ```
     $>python chatBotAPIPythonREST.py

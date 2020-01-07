@@ -18,9 +18,9 @@ import time
 auth_obj = None
 
 # Authentication Variables
-_username = 'XXXXXX'
-_password = 'XXXXXX'
-_app_key = 'XXXXXX'
+_username = 'XXXXX'
+_password = 'XXXXX'
+_app_key = 'XXXXX'
 
 
 class RDPTokenManagement:
@@ -28,6 +28,7 @@ class RDPTokenManagement:
     username = ''
     password = ''
     app_key = ''
+    before_timeout = 0
 
     # RDP Authentication Service Detail
     rdp_authen_version = "/v1"
@@ -41,10 +42,11 @@ class RDPTokenManagement:
     # Create RDP Authentication service URL
     authen_URL = base_URL + category_URL + rdp_authen_version + endpoint_URL
 
-    def __init__(self, username, password, app_key):
+    def __init__(self, username, password, app_key, before_timeout=10):
         self.username = username
         self.password = password
         self.app_key = app_key
+        self.before_timeout = before_timeout
 
     # Create new RDP Authentication request message and send it to RDP service
     def request_new_token(self, refresh_token):
@@ -66,6 +68,10 @@ class RDPTokenManagement:
                 "grant_type": "refresh_token",
             }
         response = None
+
+        print("SENT:")
+        print(json.dumps(authen_request_msg, sort_keys=True,
+                         indent=2, separators=(',', ':')))
 
         try:
             # Send request message to RDP with Python requests module
@@ -129,10 +135,13 @@ class RDPTokenManagement:
 
     # Save RDP Authentication information (Access Token, Refresh Token and Expire time) into the file
     def save_authen_to_file(self, _authen_obj):
+
         with open(self.token_file, 'w') as saved_token:  # Open './token.txt' file
             print('Saving Authentication information to file')
+            # _authen_obj['expires_tm'] = time.time() + int(_authen_obj['expires_in']) - 10
             _authen_obj['expires_tm'] = time.time(
-            ) + int(_authen_obj['expires_in']) - 10
+            ) + int(_authen_obj['expires_in']) - self.before_timeout
+
             json.dump(_authen_obj, saved_token, indent=4)
 
     # Get RDP Authentication Token from './token.txt' file first.
@@ -140,13 +149,15 @@ class RDPTokenManagement:
     def get_token(self):
         is_request_error = False
         try:
+            print('Checking RDP token information in %s' % (self.token_file))
             with open(self.token_file, 'r+') as saved_token:  # Open './token.txt' file
                 auth_obj = json.load(saved_token)
                 if auth_obj['expires_tm'] > time.time():  # Access Token is still active
+                    print('Token is still active')
                     return auth_obj
 
             # Access Token expire
-            print('Token expired, request a new Token with refresh token')
+            print('Token expired, request a new Token with a refresh token')
             status, auth_obj = self.request_new_token(
                 auth_obj['refresh_token'])
         except IOError as e:
@@ -175,7 +186,7 @@ class RDPTokenManagement:
 if __name__ == '__main__':
     print('Getting RDP Authentication Token')
 
-    rdp_token = rdpToken(_username, _password, _app_key)
+    rdp_token = RDPTokenManagement(_username, _password, _app_key)
     auth_obj = rdp_token.get_token()
     if auth_obj:
         print('access token = %s' % auth_obj['access_token'])

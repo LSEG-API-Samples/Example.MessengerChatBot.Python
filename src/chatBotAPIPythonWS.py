@@ -27,16 +27,16 @@ bot_password = 'XXXXX'
 # Input your Messenger account AppKey.
 app_key = 'XXXXX'
 
-# Authentication objects
+# Authentication and connection objects
 auth_token = None
 rdp_token = None
-
-chatroom_id = None
-
+access_token = None
 expire_time = 0
-joined_rooms = None
-
 logged_in = False
+
+# Chatroom objects
+chatroom_id = None
+joined_rooms = None
 
 # Please verify below URL is correct via the WS lookup
 ws_url = "wss://api.collab.refinitiv.com/services/nt/api/messenger/v1/stream"
@@ -45,10 +45,9 @@ ws_url = "wss://api.collab.refinitiv.com/services/nt/api/messenger/v1/stream"
 def authen_rdp(rdp_token_object):  # Call RDPTokenManagement to get authentication
     auth_token = rdp_token_object.get_token()
     if auth_token:
-        return auth_token, True
+        return auth_token['access_token'], auth_token['expires_in'], True
     else:
-        return None, False
-    # return auth_token
+        return None, 0, False
 
 
 # Get List of Chatrooms Function via HTTP REST
@@ -179,34 +178,30 @@ def leave_chatroom(access_token, joined_rooms, room_id=None, room_is_managed=Fal
 # =============================== WebSocket functions ========================================
 
 
-def on_message(_, message):
-    """ Called when message received, parse message into JSON for processing """
-    print("RECEIVED: ")
+def on_message(_, message):  # Called when message received, parse message into JSON for processing
+    print("Received: ")
     message_json = json.loads(message)
     print(json.dumps(message_json, sort_keys=True, indent=2, separators=(',', ':')))
     process_message(message_json)
 
 
-def on_error(_, error):
-    """ Called when websocket error has occurred """
+def on_error(_, error):  # Called when websocket error has occurred
     print(error)
 
 
-def on_close(_):
-    """ Called when websocket is closed """
-    print("WebSocket Closed")
+def on_close(_):  # Called when websocket is closed
+    print("Connection Closed")
 
 
-def on_open(_):
-    """ Called when handshake is complete and websocket is open, send login """
-    print("WebSocket successfully connected!")
-    send_ws_connect_request(auth_token['access_token'])
+def on_open(_):  # Called when handshake is complete and websocket is open, send login
+    print("WebSocket Client connection is established")
+    # Send "connect command to the WebSocket server"
+    send_ws_connect_request(access_token)
 
 
 # Send a connection request to Messenger ChatBot API WebSocket server
 def send_ws_connect_request(access_token):
-    # set initial point for Python Random module
-    random.seed(1)
+
     # create connection request message in JSON format
     connect_request_msg = {
         'reqId': str(random.randint(0, 1000000)),
@@ -216,7 +211,7 @@ def send_ws_connect_request(access_token):
         }
     }
     web_socket_app.send(json.dumps(connect_request_msg))
-    print("SENT:")
+    print("Sent:")
     print(json.dumps(
         connect_request_msg,
         sort_keys=True,
@@ -224,8 +219,7 @@ def send_ws_connect_request(access_token):
 
 
 def send_ws_keepalive(access_token):
-    # set initial point for Python Random module
-    random.seed(1)
+
     # create connection request message in JSON format
     connect_request_msg = {
         'reqId': str(random.randint(0, 1000000)),
@@ -235,7 +229,7 @@ def send_ws_keepalive(access_token):
         }
     }
     web_socket_app.send(json.dumps(connect_request_msg))
-    print("SENT:")
+    print("Sent:")
     print(json.dumps(
         connect_request_msg,
         sort_keys=True,
@@ -243,17 +237,18 @@ def send_ws_keepalive(access_token):
 
 
 def process_message(message_json):
-    #print('Process Message')
+
     message_event = message_json['event']
-    #print('event = ', message_event)
+
     if message_event == 'chatroomPost':
         try:
             incoming_msg = message_json['post']['message']
+            print('Receive text message: %s' % (incoming_msg))
             if incoming_msg == "/help" or incoming_msg == "C1" or incoming_msg == "C2" or incoming_msg == "C3":
                 post_message_to_chatroom(
-                    auth_token['access_token'], joined_rooms, chatroom_id, 'What would you like help with?\n ')
-            else:
-                print('Receive message = ', incoming_msg)
+                    access_token, joined_rooms, chatroom_id, 'What would you like help with?\n ')
+            # else:
+                #print('receive message : ', incoming_msg)
         except Exception as error:
             print('Post meesage to a Chatroom fail :', error)
 
@@ -265,18 +260,16 @@ if __name__ == '__main__':
 
     #print('logged_in = ', logged_in)
     # Create and initiate RDPTokenManagement object
-    rdp_token = RDPTokenManagement(bot_username, bot_password, app_key)
+    rdp_token = RDPTokenManagement(bot_username, bot_password, app_key, 30)
 
     # Authenticate with RDP Token service
-    auth_token, logged_in = authen_rdp(rdp_token)
-    #print('auth_token, logged_in = authen_rdp(rdp_token) logged_in = ', logged_in)
-    if not auth_token:
+    access_token, expire_time, logged_in = authen_rdp(rdp_token)
+    # if not auth_token:
+    if not access_token:
         sys.exit(1)
 
     print('Successfully Authenticated ')
 
-    access_token = auth_token['access_token']
-    expire_time = auth_token['expires_in']
     # List associated Chatrooms
     print('Get Rooms ')
     status, chatroom_respone = list_chatrooms(access_token)
@@ -318,13 +311,12 @@ if __name__ == '__main__':
             else:
                 # Fail the refresh since value too small
                 sys.exit(1)
-            #sts_token, refresh_token, expire_time = get_sts_token( refresh_token)
-            print('Refresh Token ')
-            auth_token, logged_in = authen_rdp(rdp_token)
-            if not auth_token:
-                sys.exit(1)
 
-            # Update token.
+            print('Refresh Token ')
+            access_token, expire_time, logged_in = authen_rdp(rdp_token)
+            if not access_token:
+                sys.exit(1)
+            # Update authentication token to the WebSocket connection.
             if logged_in:
                 send_ws_keepalive(access_token)
     except KeyboardInterrupt:

@@ -26,8 +26,11 @@ recipient_email = 'XXXXX'
 # Authentication objects
 auth_token = None
 rdp_token = None
-
 chatroom_id = None
+
+# Please verify below URL is correct
+gw_url = 'https://api.refinitiv.com'
+bot_api_base_path = '/messenger/beta1'
 
 
 def authen_rdp(rdp_token_object):  # Call RDPTokenManagement to get authentication
@@ -39,16 +42,15 @@ def authen_rdp(rdp_token_object):  # Call RDPTokenManagement to get authenticati
 def list_chatrooms(access_token, room_is_managed=False):
 
     if room_is_managed:
-        url = 'https://api.refinitiv.com/messenger/beta1/managed_chatrooms'
+        url = '{}{}/managed_chatrooms'.format(gw_url, bot_api_base_path)
     else:
-        url = 'https://api.refinitiv.com/messenger/beta1/chatrooms'
+        url = '{}{}/chatrooms'.format(gw_url, bot_api_base_path)
 
-    headers = {'Accept': 'application/json',
-               'Authorization': 'Bearer {}'.format(access_token)}
     response = None
     try:
         # Send a HTTP request message with Python requests module
-        response = requests.get(url, headers=headers)
+        response = requests.get(
+            url, headers={'Authorization': 'Bearer {}'.format(access_token)})
     except requests.exceptions.RequestException as e:
         print('Messenger BOT API: List Chatroom exception failure:', e)
 
@@ -65,19 +67,17 @@ def list_chatrooms(access_token, room_is_managed=False):
 def join_chatroom(access_token, room_id=None, room_is_managed=False):  # Join chatroom
     joined_rooms = []
     if room_is_managed:
-        url = 'https://api.refinitiv.com/messenger/beta1/managed_chatrooms/{}/join'.format(
-            room_id)
+        url = '{}{}/managed_chatrooms/{}/join'.format(
+            gw_url, bot_api_base_path, room_id)
     else:
-        url = 'https://api.refinitiv.com/messenger/beta1/chatrooms/{}/join'.format(
-            room_id)
-
-    headers = {'Accept': 'application/json',
-               'Authorization': 'Bearer {}'.format(access_token)}
+        url = '{}{}/chatrooms/{}/join'.format(gw_url,
+                                              bot_api_base_path, room_id)
 
     response = None
     try:
         # Send a HTTP request message with Python requests module
-        response = requests.post(url, headers=headers)
+        response = requests.post(
+            url, headers={'Authorization': 'Bearer {}'.format(access_token)})
     except requests.exceptions.RequestException as e:
         print('Messenger BOT API: join chatroom exception failure:', e)
 
@@ -94,10 +94,7 @@ def join_chatroom(access_token, room_id=None, room_is_managed=False):  # Join ch
 
 # send 1 to 1 message to recipient email directly without a Chatroom via BOT
 def post_direct_message(access_token, contact_email='', text=''):
-    url = 'https://api.refinitiv.com/messenger/beta1/message'
-
-    headers = {'Accept': 'application/json',
-               'Authorization': 'Bearer {}'.format(access_token)}
+    url = '{}{}/message'.format(gw_url, bot_api_base_path)
 
     body = {
         'recipientEmail': contact_email,
@@ -106,7 +103,7 @@ def post_direct_message(access_token, contact_email='', text=''):
     try:
         # Send a HTTP request message with Python requests module
         response = requests.post(
-            url=url, data=json.dumps(body), headers=headers)
+            url=url, data=json.dumps(body), headers={'Authorization': 'Bearer {}'.format(access_token)})
     except requests.exceptions.RequestException as e:
         print('Messenger BOT API: post a 1 to 1 message exception failure:', e)
 
@@ -126,22 +123,20 @@ def post_message_to_chatroom(access_token,  joined_rooms, room_id=None,  text=''
 
     if joined_rooms:
         if room_is_managed:
-            url = 'https://api.refinitiv.com/messenger/beta1/managed_chatrooms/{}/post'.format(
-                room_id)
+            url = '{}{}/managed_chatrooms/{}/post'.format(
+                gw_url, bot_api_base_path, room_id)
         else:
-            url = 'https://api.refinitiv.com/messenger/beta1/chatrooms/{}/post'.format(
-                room_id)
+            url = '{}{}/chatrooms/{}/post'.format(
+                gw_url, bot_api_base_path, room_id)
 
-        headers = {'Accept': 'application/json',
-                   'Authorization': 'Bearer {}'.format(access_token)}
         body = {
-            "message": text
+            'message': text
         }
 
         response = None
         try:
             response = requests.post(
-                url=url, data=json.dumps(body), headers=headers)  # Send a HTTP request message with Python requests module
+                url=url, data=json.dumps(body), headers={'Authorization': 'Bearer {}'.format(access_token)})  # Send a HTTP request message with Python requests module
         except requests.exceptions.RequestException as e:
             print('Messenger BOT API: post message exception failure:', e)
 
@@ -160,19 +155,17 @@ def leave_chatroom(access_token, joined_rooms, room_id=None, room_is_managed=Fal
 
     if room_id in joined_rooms:
         if room_is_managed:
-            url = 'https://api.refinitiv.com/messenger/beta1/managed_chatrooms/{}/leave'.format(
-                room_id)
+            url = '{}{}/managed_chatrooms/{}/leave'.format(
+                gw_url, bot_api_base_path, room_id)
         else:
-            url = 'https://api.refinitiv.com/messenger/beta1/chatrooms/{}/leave'.format(
-                room_id)
-
-        headers = {'Accept': 'application/json',
-                   'Authorization': 'Bearer {}'.format(access_token)}
+            url = '{}{}/chatrooms/{}/leave'.format(
+                gw_url, bot_api_base_path, room_id)
 
         response = None
         try:
             # Send a HTTP request message with Python requests module
-            response = requests.post(url, headers=headers)
+            response = requests.post(
+                url, headers={'Authorization': 'Bearer {}'.format(access_token)})
         except requests.exceptions.RequestException as e:
             print('Messenger BOT API: leave chatroom exception failure:', e)
 
@@ -217,7 +210,7 @@ if __name__ == '__main__':
 
     # print(json.dumps(chatroom_respone, sort_keys=True,indent=2, separators=(',', ':')))
 
-    chatroom_id = chatroom_respone["chatrooms"][0]["chatroomId"]
+    chatroom_id = chatroom_respone['chatrooms'][0]['chatroomId']
     # print('Chatroom ID is ', chatroom_id)
 
     # Join associated Chatroom

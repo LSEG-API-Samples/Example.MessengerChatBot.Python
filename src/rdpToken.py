@@ -28,19 +28,21 @@ class RDPTokenManagement:
     username = ''
     password = ''
     app_key = ''
+    client_secret = ''
     before_timeout = 0
 
     # RDP Authentication Service Detail
-    rdp_authen_version = "/v1"
-    base_URL = "https://api.refinitiv.com"
-    category_URL = "/auth/oauth2"
-    endpoint_URL = "/token"
-    client_secret = ""
-    token_file = "./token.txt"
-    scope = "trapi.messenger"
+    rdp_authen_version = '/v1'
+    base_URL = 'https://api.refinitiv.com'
+    category_URL = '/auth/oauth2'
+    #endpoint_URL = '/token'
+    token_file = './token.txt'
+    scope = 'trapi.messenger'
 
     # Create RDP Authentication service URL
-    authen_URL = base_URL + category_URL + rdp_authen_version + endpoint_URL
+    #authen_URL = base_URL + category_URL + rdp_authen_version + endpoint_URL
+    authen_URL = '{}{}{}/token'.format(base_URL,
+                                       category_URL, rdp_authen_version)
 
     def __init__(self, username, password, app_key, before_timeout=10):
         self.username = username
@@ -54,29 +56,31 @@ class RDPTokenManagement:
         # Create a request message
         if not refresh_token:
             authen_request_msg = {
-                "username": self.username,
-                "password": self.password,
-                "client_id":  self.app_key,
-                "grant_type": "password",
-                "scope": self.scope,
-                "takeExclusiveSignOnControl": "true"
+                'username': self.username,
+                'password': self.password,
+                'client_id':  self.app_key,
+                'grant_type': 'password',
+                'scope': self.scope,
+                'takeExclusiveSignOnControl': 'true'
             }
         else:
             authen_request_msg = {
-                "refresh_token": refresh_token,
-                "username": self.username,
-                "grant_type": "refresh_token",
+                'refresh_token': refresh_token,
+                'username': self.username,
+                'grant_type': 'refresh_token',
             }
         response = None
 
-        print("SENT:")
+        print('SENT:')
         print(json.dumps(authen_request_msg, sort_keys=True,
                          indent=2, separators=(',', ':')))
 
         try:
             # Send request message to RDP with Python requests module
             response = requests.post(self.authen_URL,
-                                     headers={'Accept': 'application/json'},
+                                     headers={
+                                         'Accept': 'application/json',
+                                         'Content-Type': 'application/x-www-form-urlencoded'},
                                      data=authen_request_msg,
                                      auth=(
                                          self.app_key,
@@ -94,7 +98,7 @@ class RDPTokenManagement:
             # both access and refresh tokens are expired
             if response.status_code == 400 and response.json()['error'] == 'invalid_grant':
                 print('Both Access Token and Refresh Token are expired')
-                raise Exception("Both Access Token and Refresh Token are expired {0} - {1}"
+                raise Exception('Both Access Token and Refresh Token are expired {0} - {1}'
                                 .format(response.status_code, response.text))
         return response.status_code, response.json()
 
@@ -103,18 +107,19 @@ class RDPTokenManagement:
 
         # Create request message
         change_password_req_msg = {
-            "grant_type": "password",
-            "username": _username,
-            "password": old_password,
-            "newPassword": new_password,
-            "scope": scope,
-            "takeExclusiveSignOnControl": "true"
+            'grant_type': 'password',
+            'username': _username,
+            'password': old_password,
+            'newPassword': new_password,
+            'scope': scope,
+            'takeExclusiveSignOnControl': 'true'
         }
 
         try:
             response = requests.post(self.authen_URL,
                                      headers={
-                                         'Accept': 'application/json'},
+                                         'Accept': 'application/json',
+                                         'Content-Type': 'application/x-www-form-urlencoded'},
                                      data=authen_request_msg,
                                      auth=(
                                          app_key,
@@ -169,7 +174,7 @@ class RDPTokenManagement:
             print('None Token found, requesting a new one')
             is_request_error = True
         except:
-            print("Getting a new token...")
+            print('Getting a new token...')
             is_request_error = True
 
         if is_request_error:  # if first request returns error, re-request RDP Access Token

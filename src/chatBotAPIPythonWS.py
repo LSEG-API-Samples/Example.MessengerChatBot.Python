@@ -39,12 +39,15 @@ chatroom_id = None
 joined_rooms = None
 
 # Please verify below URL is correct via the WS lookup
-ws_url = "wss://api.collab.refinitiv.com/services/nt/api/messenger/v1/stream"
+ws_url = 'wss://api.collab.refinitiv.com/services/nt/api/messenger/v1/stream'
+gw_url = 'https://api.refinitiv.com'
+bot_api_base_path = '/messenger/beta1'
 
 
 def authen_rdp(rdp_token_object):  # Call RDPTokenManagement to get authentication
     auth_token = rdp_token_object.get_token()
     if auth_token:
+        # return RDP access token (sts_token) , expire_in values and RDP login status
         return auth_token['access_token'], auth_token['expires_in'], True
     else:
         return None, 0, False
@@ -54,16 +57,15 @@ def authen_rdp(rdp_token_object):  # Call RDPTokenManagement to get authenticati
 def list_chatrooms(access_token, room_is_managed=False):
 
     if room_is_managed:
-        url = 'https://api.refinitiv.com/messenger/beta1/managed_chatrooms'
+        url = '{}{}/managed_chatrooms'.format(gw_url, bot_api_base_path)
     else:
-        url = 'https://api.refinitiv.com/messenger/beta1/chatrooms'
+        url = '{}{}/chatrooms'.format(gw_url, bot_api_base_path)
 
-    headers = {'Accept': 'application/json',
-               'Authorization': 'Bearer {}'.format(access_token)}
     response = None
     try:
         # Send a HTTP request message with Python requests module
-        response = requests.get(url, headers=headers)
+        response = requests.get(
+            url, headers={'Authorization': 'Bearer {}'.format(access_token)})
     except requests.exceptions.RequestException as e:
         print('Messenger BOT API: List Chatroom exception failure:', e)
 
@@ -80,19 +82,17 @@ def list_chatrooms(access_token, room_is_managed=False):
 def join_chatroom(access_token, room_id=None, room_is_managed=False):  # Join chatroom
     joined_rooms = []
     if room_is_managed:
-        url = 'https://api.refinitiv.com/messenger/beta1/managed_chatrooms/{}/join'.format(
-            room_id)
+        url = '{}{}/managed_chatrooms/{}/join'.format(
+            gw_url, bot_api_base_path, room_id)
     else:
-        url = 'https://api.refinitiv.com/messenger/beta1/chatrooms/{}/join'.format(
-            room_id)
-
-    headers = {'Accept': 'application/json',
-               'Authorization': 'Bearer {}'.format(access_token)}
+        url = '{}{}/chatrooms/{}/join'.format(gw_url,
+                                              bot_api_base_path, room_id)
 
     response = None
     try:
         # Send a HTTP request message with Python requests module
-        response = requests.post(url, headers=headers)
+        response = requests.post(
+            url, headers={'Authorization': 'Bearer {}'.format(access_token)})
     except requests.exceptions.RequestException as e:
         print('Messenger BOT API: join chatroom exception failure:', e)
 
@@ -114,22 +114,21 @@ def post_message_to_chatroom(access_token,  joined_rooms, room_id=None,  text=''
 
     if joined_rooms:
         if room_is_managed:
-            url = 'https://api.refinitiv.com/messenger/beta1/managed_chatrooms/{}/post'.format(
-                room_id)
+            url = '{}{}/managed_chatrooms/{}/post'.format(
+                gw_url, bot_api_base_path, room_id)
         else:
-            url = 'https://api.refinitiv.com/messenger/beta1/chatrooms/{}/post'.format(
-                room_id)
+            url = '{}{}/chatrooms/{}/post'.format(
+                gw_url, bot_api_base_path, room_id)
 
-        headers = {'Accept': 'application/json',
-                   'Authorization': 'Bearer {}'.format(access_token)}
         body = {
-            "message": text
+            'message': text
         }
 
         response = None
         try:
+            # Send a HTTP request message with Python requests module
             response = requests.post(
-                url=url, data=json.dumps(body), headers=headers)  # Send a HTTP request message with Python requests module
+                url=url, data=json.dumps(body), headers={'Authorization': 'Bearer {}'.format(access_token)})
         except requests.exceptions.RequestException as e:
             print('Messenger BOT API: post message to exception failure:', e)
 
@@ -148,23 +147,21 @@ def leave_chatroom(access_token, joined_rooms, room_id=None, room_is_managed=Fal
 
     if room_id in joined_rooms:
         if room_is_managed:
-            url = 'https://api.refinitiv.com/messenger/beta1/managed_chatrooms/{}/leave'.format(
-                room_id)
+            url = '{}{}/managed_chatrooms/{}/leave'.format(
+                gw_url, bot_api_base_path, room_id)
         else:
-            url = 'https://api.refinitiv.com/messenger/beta1/chatrooms/{}/leave'.format(
-                room_id)
-
-        headers = {'Accept': 'application/json',
-                   'Authorization': 'Bearer {}'.format(access_token)}
+            url = '{}{}/chatrooms/{}/leave'.format(
+                gw_url, bot_api_base_path, room_id)
 
         response = None
         try:
             # Send a HTTP request message with Python requests module
-            response = requests.post(url, headers=headers)
+            response = requests.post(
+                url, headers={'Authorization': 'Bearer {}'.format(access_token)})
         except requests.exceptions.RequestException as e:
             print('Messenger BOT API: leave chatroom exception failure:', e)
 
-        if response.status_code == 200:
+        if response.status_code == 200:  # HTTP Status 'OK'
             print('Messenger BOT API: leave chatroom success')
         else:
             print('Messenger BOT API: leave chatroom failure:',
@@ -179,7 +176,7 @@ def leave_chatroom(access_token, joined_rooms, room_id=None, room_is_managed=Fal
 
 
 def on_message(_, message):  # Called when message received, parse message into JSON for processing
-    print("Received: ")
+    print('Received: ')
     message_json = json.loads(message)
     print(json.dumps(message_json, sort_keys=True, indent=2, separators=(',', ':')))
     process_message(message_json)
@@ -190,11 +187,12 @@ def on_error(_, error):  # Called when websocket error has occurred
 
 
 def on_close(_):  # Called when websocket is closed
-    print("Connection Closed")
+    print('WebSocket Connection Closed')
+    leave_chatroom(access_token, joined_rooms, chatroom_id)
 
 
 def on_open(_):  # Called when handshake is complete and websocket is open, send login
-    print("WebSocket Client connection is established")
+    print('WebSocket Connection is established')
     # Send "connect command to the WebSocket server"
     send_ws_connect_request(access_token)
 
@@ -211,7 +209,7 @@ def send_ws_connect_request(access_token):
         }
     }
     web_socket_app.send(json.dumps(connect_request_msg))
-    print("Sent:")
+    print('Sent:')
     print(json.dumps(
         connect_request_msg,
         sort_keys=True,
@@ -229,7 +227,7 @@ def send_ws_keepalive(access_token):
         }
     }
     web_socket_app.send(json.dumps(connect_request_msg))
-    print("Sent:")
+    print('Sent:')
     print(json.dumps(
         connect_request_msg,
         sort_keys=True,
@@ -244,11 +242,11 @@ def process_message(message_json):
         try:
             incoming_msg = message_json['post']['message']
             print('Receive text message: %s' % (incoming_msg))
-            if incoming_msg == "/help" or incoming_msg == "C1" or incoming_msg == "C2" or incoming_msg == "C3":
+            if incoming_msg == '/help' or incoming_msg == 'C1' or incoming_msg == 'C2' or incoming_msg == 'C3':
                 post_message_to_chatroom(
                     access_token, joined_rooms, chatroom_id, 'What would you like help with?\n ')
-            elif incoming_msg == "/complex_message":
-                # Sending tabular data, hyperlinks and a full set of emoji in a message to a Chatroom
+            # Sending tabular data, hyperlinks and a full set of emoji in a message to a Chatroom
+            elif incoming_msg == '/complex_message':
                 complex_msg = """
                 USD BBL EU AM Assessment at 11:30 UKT\nName\tAsmt\t10-Apr-19\tFair Value\t10-Apr-19\tHst Cls\nBRT Sw APR19\t70.58\t05:07\t(up) 71.04\t10:58\t70.58\nBRTSw MAY19\t70.13\t05:07\t(dn) 70.59\t10:58\t70.14\nBRT Sw JUN19\t69.75\t05:07\t(up)70.2\t10:58\t69.76
                 """
@@ -280,9 +278,9 @@ if __name__ == '__main__':
     print('Get Rooms ')
     status, chatroom_respone = list_chatrooms(access_token)
 
-    # print(json.dumps(chatroom_respone, sort_keys=True,indent=2, separators=(',', ':')))
+    #print(json.dumps(chatroom_respone, sort_keys=True,indent=2, separators=(',', ':')))
 
-    chatroom_id = chatroom_respone["chatrooms"][0]["chatroomId"]
+    chatroom_id = chatroom_respone['chatrooms'][0]['chatroomId']
     # print('Chatroom ID is ', chatroom_id)
 
     # Join associated Chatroom
@@ -294,7 +292,7 @@ if __name__ == '__main__':
         sys.exit(1)
 
     # Connect to a Chatroom via a WebSocket connection
-    print("Connecting to WebSocket %s ... " % (ws_url))
+    print('Connecting to WebSocket %s ... ' % (ws_url))
     web_socket_app = websocket.WebSocketApp(
         ws_url,
         on_message=on_message,

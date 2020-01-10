@@ -12,6 +12,7 @@
 import requests
 import json
 import sys
+import logging
 from rdpToken import RDPTokenManagement
 
 # Input your Bot Username
@@ -22,6 +23,9 @@ bot_password = 'XXXXX'
 app_key = 'XXXXX'
 # Input your Eikon Messenger account email
 recipient_email = 'XXXXX'
+# Setting Log level the supported value is 'logging.WARN' and 'logging.DEBUG'
+log_level = logging.WARN
+
 
 # Authentication objects
 auth_token = None
@@ -84,6 +88,9 @@ def join_chatroom(access_token, room_id=None, room_is_managed=False):  # Join ch
     if response.status_code == 200:  # HTTP Status 'OK'
         joined_rooms.append(room_id)
         print('Messenger BOT API: join chatroom success')
+        # Print for debugging purpose
+        logging.debug('Receive: %s' % (json.dumps(response.json(),
+                                                  sort_keys=True, indent=2, separators=(',', ':'))))
     else:
         print('Messenger BOT API: join chatroom result failure:',
               response.status_code, response.reason)
@@ -100,6 +107,11 @@ def post_direct_message(access_token, contact_email='', text=''):
         'recipientEmail': contact_email,
         'message': text
     }
+
+    # Print for debugging purpose
+    logging.debug('Sent: %s' % (json.dumps(
+        body, sort_keys=True, indent=2, separators=(',', ':'))))
+
     try:
         # Send a HTTP request message with Python requests module
         response = requests.post(
@@ -110,6 +122,9 @@ def post_direct_message(access_token, contact_email='', text=''):
     if response.status_code == 200:  # HTTP Status 'OK'
         print('Messenger BOT API: post a 1 to 1 message to %s success' %
               (contact_email))
+        # Print for debugging purpose
+        logging.debug('Receive: %s' % (json.dumps(response.json(),
+                                                  sort_keys=True, indent=2, separators=(',', ':'))))
     else:
         print('Messenger BOT API: post a 1 to 1 message failure:',
               response.status_code, response.reason)
@@ -133,6 +148,10 @@ def post_message_to_chatroom(access_token,  joined_rooms, room_id=None,  text=''
             'message': text
         }
 
+        # Print for debugging purpose
+        logging.debug('Sent: %s' % (json.dumps(
+            body, sort_keys=True, indent=2, separators=(',', ':'))))
+
         response = None
         try:
             response = requests.post(
@@ -143,6 +162,9 @@ def post_message_to_chatroom(access_token,  joined_rooms, room_id=None,  text=''
         if response.status_code == 200:  # HTTP Status 'OK'
             joined_rooms.append(room_id)
             print('Messenger BOT API: post message to chatroom success')
+            # Print for debugging purpose
+            logging.debug('Receive: %s' % (json.dumps(
+                response.json(), sort_keys=True, indent=2, separators=(',', ':'))))
         else:
             print('Messenger BOT API: post message to failure:',
                   response.status_code, response.reason)
@@ -171,6 +193,9 @@ def leave_chatroom(access_token, joined_rooms, room_id=None, room_is_managed=Fal
 
         if response.status_code == 200:
             print('Messenger BOT API: leave chatroom success')
+            # Print for debugging purpose
+            logging.debug('Receive: %s' % (json.dumps(
+                response.json(), sort_keys=True, indent=2, separators=(',', ':'))))
         else:
             print('Messenger BOT API: leave chatroom failure:',
                   response.status_code, response.reason)
@@ -184,10 +209,16 @@ def leave_chatroom(access_token, joined_rooms, room_id=None, room_is_managed=Fal
 # =============================== Main Process ========================================
 # Running the tutorial
 if __name__ == '__main__':
+
+    # Setting Python Logging
+    logging.basicConfig(
+        format='%(levelname)s:%(name)s :%(message)s', level=log_level)
+
     print('Getting RDP Authentication Token')
 
     # Create and initiate RDPTokenManagement object
-    rdp_token = RDPTokenManagement(bot_username, bot_password, app_key)
+    rdp_token = RDPTokenManagement(
+        bot_username, bot_password, app_key)
 
     # Authenticate with RDP Token service
     access_token = authen_rdp(rdp_token)
@@ -208,7 +239,8 @@ if __name__ == '__main__':
     print('Get Rooms ')
     status, chatroom_respone = list_chatrooms(access_token)
 
-    # print(json.dumps(chatroom_respone, sort_keys=True,indent=2, separators=(',', ':')))
+    print(json.dumps(chatroom_respone, sort_keys=True,
+                     indent=2, separators=(',', ':')))
 
     chatroom_id = chatroom_respone['chatrooms'][0]['chatroomId']
     # print('Chatroom ID is ', chatroom_id)

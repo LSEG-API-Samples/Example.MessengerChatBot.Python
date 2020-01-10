@@ -9,4 +9,4 @@ test/
 chatbot_pythonenv/
 src/token.txt
 src/__pycache__
-src/rdpTokenAsModule.py
+

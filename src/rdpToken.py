@@ -13,6 +13,7 @@
 import requests
 import json
 import time
+import logging
 
 # Authentication objects
 auth_obj = None
@@ -31,6 +32,11 @@ class RDPTokenManagement:
     client_secret = ''
     before_timeout = 0
 
+    # Create a custom logger
+    # logger = logging.getLogger(__name__)
+    # create console handler
+    # console_logger = logging.StreamHandler()
+
     # RDP Authentication Service Detail
     rdp_authen_version = '/v1'
     base_URL = 'https://api.refinitiv.com'
@@ -44,7 +50,7 @@ class RDPTokenManagement:
     authen_URL = '{}{}{}/token'.format(base_URL,
                                        category_URL, rdp_authen_version)
 
-    def __init__(self, username, password, app_key, before_timeout=10):
+    def __init__(self, username, password, app_key,  before_timeout=10):
         self.username = username
         self.password = password
         self.app_key = app_key
@@ -71,10 +77,9 @@ class RDPTokenManagement:
             }
         response = None
 
-        print('SENT:')
-        print(json.dumps(authen_request_msg, sort_keys=True,
-                         indent=2, separators=(',', ':')))
-
+        # Print for debugging purpose
+        logging.debug('Sent: %s' % (json.dumps(
+            authen_request_msg, sort_keys=True, indent=2, separators=(',', ':'))))
         try:
             # Send request message to RDP with Python requests module
             response = requests.post(self.authen_URL,
@@ -91,6 +96,9 @@ class RDPTokenManagement:
 
         if response.status_code == 200:  # HTTP Status 'OK'
             print('Authenticaion success')
+            # Print RDP authentication response message for debugging purpose
+            logging.debug('Receive: %s' % (json.dumps(
+                response.json(), sort_keys=True, indent=2, separators=(',', ':'))))
         else:  # Handle HTTP error
             print('RDP authentication result failure:',
                   response.status_code, response.reason)
@@ -115,6 +123,10 @@ class RDPTokenManagement:
             'takeExclusiveSignOnControl': 'true'
         }
 
+        # Print for debugging purpose
+        logging.debug('Sent: %s' % (json.dumps(
+            change_password_req_msg, sort_keys=True, indent=2, separators=(',', ':'))))
+
         try:
             response = requests.post(self.authen_URL,
                                      headers={
@@ -130,6 +142,9 @@ class RDPTokenManagement:
 
         if response.status_code == 200:  # HTTP Status 'OK'
             print('Change Password success')
+            # Print RDP Change Password response message for debugging purpose
+            logging.debug('Receive: %s' % (json.dumps(
+                response.json(), sort_keys=True, indent=2, separators=(',', ':'))))
             self.save_authen_to_file(response.json())
         else:
             print('RDP Change Password result failure:',
@@ -189,9 +204,14 @@ class RDPTokenManagement:
 
 # =============================================================================
 if __name__ == '__main__':
+
+    logging.basicConfig(
+        format='%(levelname)s:%(name)s :%(message)s', level=logging.DEBUG)
+
     print('Getting RDP Authentication Token')
 
-    rdp_token = RDPTokenManagement(_username, _password, _app_key)
+    rdp_token = RDPTokenManagement(
+        _username, _password, _app_key, logging.WARN)
     auth_obj = rdp_token.get_token()
     if auth_obj:
         print('access token = %s' % auth_obj['access_token'])

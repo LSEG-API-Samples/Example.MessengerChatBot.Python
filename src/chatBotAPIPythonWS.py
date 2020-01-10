@@ -18,6 +18,7 @@ import json
 import websocket
 import threading
 import random
+import logging
 from rdpToken import RDPTokenManagement
 
 # Input your Bot Username
@@ -26,6 +27,8 @@ bot_username = 'XXXXX'
 bot_password = 'XXXXX'
 # Input your Messenger account AppKey.
 app_key = 'XXXXX'
+# Setting Log level the supported value is 'logging.WARN' and 'logging.DEBUG'
+log_level = logging.WARN
 
 # Authentication and connection objects
 auth_token = None
@@ -99,6 +102,9 @@ def join_chatroom(access_token, room_id=None, room_is_managed=False):  # Join ch
     if response.status_code == 200:  # HTTP Status 'OK'
         joined_rooms.append(room_id)
         print('Messenger BOT API: join chatroom success')
+        # Print for debugging purpose
+        logging.debug('Receive: %s' % (json.dumps(response.json(),
+                                                  sort_keys=True, indent=2, separators=(',', ':'))))
     else:
         print('Messenger BOT API: join chatroom result failure:',
               response.status_code, response.reason)
@@ -124,6 +130,10 @@ def post_message_to_chatroom(access_token,  joined_rooms, room_id=None,  text=''
             'message': text
         }
 
+        # Print for debugging purpose
+        logging.debug('Sent: %s' % (json.dumps(
+            body, sort_keys=True, indent=2, separators=(',', ':'))))
+
         response = None
         try:
             # Send a HTTP request message with Python requests module
@@ -135,6 +145,9 @@ def post_message_to_chatroom(access_token,  joined_rooms, room_id=None,  text=''
         if response.status_code == 200:  # HTTP Status 'OK'
             joined_rooms.append(room_id)
             print('Messenger BOT API: post message to chatroom success')
+            # Print for debugging purpose
+            logging.debug('Receive: %s' % (json.dumps(
+                response.json(), sort_keys=True, indent=2, separators=(',', ':'))))
         else:
             print('Messenger BOT API: post message to failure:',
                   response.status_code, response.reason)
@@ -163,6 +176,9 @@ def leave_chatroom(access_token, joined_rooms, room_id=None, room_is_managed=Fal
 
         if response.status_code == 200:  # HTTP Status 'OK'
             print('Messenger BOT API: leave chatroom success')
+            # Print for debugging purpose
+            logging.debug('Receive: %s' % (json.dumps(
+                response.json(), sort_keys=True, indent=2, separators=(',', ':'))))
         else:
             print('Messenger BOT API: leave chatroom failure:',
                   response.status_code, response.reason)
@@ -216,6 +232,7 @@ def send_ws_connect_request(access_token):
         indent=2, separators=(',', ':')))
 
 
+# Function for Refreshing Tokens.  Auth Tokens need to be refreshed within 5 minutes for the WebSocket to persist
 def send_ws_keepalive(access_token):
 
     # create connection request message in JSON format
@@ -234,7 +251,7 @@ def send_ws_keepalive(access_token):
         indent=2, separators=(',', ':')))
 
 
-def process_message(message_json):
+def process_message(message_json):  # Process incoming message from a joined Chatroom
 
     message_event = message_json['event']
 
@@ -260,9 +277,13 @@ def process_message(message_json):
 # =============================== Main Process ========================================
 # Running the tutorial
 if __name__ == '__main__':
+
+    # Setting Python Logging
+    logging.basicConfig(
+        format='%(levelname)s:%(name)s :%(message)s', level=log_level)
+
     print('Getting RDP Authentication Token')
 
-    #print('logged_in = ', logged_in)
     # Create and initiate RDPTokenManagement object
     rdp_token = RDPTokenManagement(bot_username, bot_password, app_key, 30)
 

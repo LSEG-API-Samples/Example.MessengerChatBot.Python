@@ -15,6 +15,8 @@ The [Messenger Bot API](https://developers.refinitiv.com/messenger-api) provides
 * [Getting the AppKey value](#appkey)
 * [Setting the Messenger application](#setting)
 * [Running the REST API demo application](#running-rest)
+* [Running the WebSocket API demo application](#running-ws)
+* [Running demo applications with debug log](#running-debug)
 * [Authors](#author)
 * [References](#references)
 
@@ -107,6 +109,37 @@ Once you have setup your Eikon Messenger user and Bot user, you can add the Bot 
     Leave Rooms
     Messenger BOT API: leave chatroom success
     ```
+## <a id="running-ws"></a>Running the WebSocket API demo application
+1. Unzip or download the tutorial project folder into a directory of your choice 
+2. Run ```$> pip install -r ws-requestments.txt``` command in a console to install all the dependencies libraries.
+3. Open the *chatBotAPIPythonWS.py** demo application source code with your editor and input the following parameters
+    - ```app_key```: Your AppKey
+    - ```bot_username```: Your Bot username
+    - ```bot_password```: Your Bot password
+4. Open a command prompt and folder *src* and run the demo application with the following command.
+    ```
+    $>python chatBotAPIPythonWS.py
+    ```
+5. The demo will perform authentication process, get an assoicate chatroom, then join that chatroom as same as the REST API demo application [above](#running-rest)
+6. Then demo connects to Eikon messenger WebSocket server. Once the application shows WebSocket ```connected``` event in a console, you can start interact with your bot via a chatroom.
+    ```
+    Messenger BOT API: join chatroom success
+    Connecting to WebSocket wss://api.collab.refinitiv.com/services/nt/api/messenger/v1/stream ...
+    WebSocket Connection is established
+    Sent:....
+    Received:
+    {
+    "event":"connected",
+    "reqId":"943378"
+    }
+    ```
+8. Eikon Messenger supports tabular data, hyperlinks and a full set of emoji in the message. You can type ```/complex_message``` into a Chatroom to see an example.
+    ![Figure-7](images/eikon_msg_complex_msg.png "Complex message") 
+
+## <a id="running-debug"></a>Running demo applications with debug log
+You can enable the REST and WebSocket application debug log level via ```log_level = logging.WARN``` application source code statement.The supported value is *logging.WARN* and *logging.DEBUG* levels.
+
+The *logging.DEBUG* level show incoming and outgoing messages between the demo applications and Eikon Messenger REST and WebSocket APIs servers.
 
 ## <a id="author"></a>Authors
 - Wasin Waeosri (wasin.waeosri@refinitiv.com)

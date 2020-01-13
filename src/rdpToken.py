@@ -18,11 +18,6 @@ import logging
 # Authentication objects
 auth_obj = None
 
-# Authentication Variables
-_username = 'XXXXX'
-_password = 'XXXXX'
-_app_key = 'XXXXX'
-
 
 class RDPTokenManagement:
     # Authentication Variables
@@ -31,11 +26,6 @@ class RDPTokenManagement:
     app_key = ''
     client_secret = ''
     before_timeout = 0
-
-    # Create a custom logger
-    # logger = logging.getLogger(__name__)
-    # create console handler
-    # console_logger = logging.StreamHandler()
 
     # RDP Authentication Service Detail
     rdp_authen_version = '/v1'
@@ -209,6 +199,11 @@ if __name__ == '__main__':
         format='%(levelname)s:%(name)s :%(message)s', level=logging.DEBUG)
 
     print('Getting RDP Authentication Token')
+
+    # Authentication Variables
+    _username = 'XXXXX'
+    _password = 'XXXXX'
+    _app_key = 'XXXXX'
 
     rdp_token = RDPTokenManagement(
         _username, _password, _app_key, logging.WARN)

@@ -133,7 +133,7 @@ Once you have setup your Eikon Messenger user and Bot user, you can add the Bot 
     "reqId":"943378"
     }
     ```
-8. Eikon Messenger supports tabular data, hyperlinks and a full set of emoji in the message. You can type ```/complex_message``` into a Chatroom to see an example.
+8. Eikon Messenger supports tabular data, hyperlinks and a full set of emoji in the message. You can type ```/complex_message``` message into a Chatroom to see an example.
     ![Figure-7](images/eikon_msg_complex_msg.png "Complex message") 
 
 ## <a id="running-debug"></a>Running demo applications with debug log

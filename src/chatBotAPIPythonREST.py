@@ -21,7 +21,7 @@ bot_username = 'XXXXX'
 bot_password = 'XXXXX'
 # Input your Messenger account AppKey.
 app_key = 'XXXXX'
-# Input your Messenger application account email
+# Input your Messenger Application account email
 recipient_email = 'XXXXX'
 # Setting Log level the supported value is 'logging.WARN' and 'logging.DEBUG'
 log_level = logging.WARN

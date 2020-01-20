@@ -22,13 +22,13 @@ import logging
 from rdpToken import RDPTokenManagement
 
 # Input your Bot Username
-bot_username = 'XXXX'
+bot_username = 'XXXXX'
 # Input Bot Password
-bot_password = 'XXXX'
+bot_password = 'XXXXX'
 # Input your Messenger account AppKey.
-app_key = 'XXXX'
+app_key = 'XXXXX'
 # Input your Messenger Application account email
-recipient_email = 'XXXX'
+recipient_email = 'XXXXX'
 # Setting Log level the supported value is 'logging.WARN' and 'logging.DEBUG'
 log_level = logging.WARN
 
@@ -113,6 +113,38 @@ def join_chatroom(access_token, room_id=None, room_is_managed=False):  # Join ch
         print('Text:', response.text)
 
     return joined_rooms
+
+
+# send 1 to 1 message to recipient email directly without a Chatroom via BOT
+def post_direct_message(access_token, contact_email='', text=''):
+    url = '{}{}/message'.format(gw_url, bot_api_base_path)
+
+    body = {
+        'recipientEmail': contact_email,
+        'message': text
+    }
+
+    # Print for debugging purpose
+    logging.debug('Sent: %s' % (json.dumps(
+        body, sort_keys=True, indent=2, separators=(',', ':'))))
+
+    try:
+        # Send a HTTP request message with Python requests module
+        response = requests.post(
+            url=url, data=json.dumps(body), headers={'Authorization': 'Bearer {}'.format(access_token)})
+    except requests.exceptions.RequestException as e:
+        print('Messenger BOT API: post a 1 to 1 message exception failure:', e)
+
+    if response.status_code == 200:  # HTTP Status 'OK'
+        print('Messenger BOT API: post a 1 to 1 message to %s success' %
+              (contact_email))
+        # Print for debugging purpose
+        logging.debug('Receive: %s' % (json.dumps(response.json(),
+                                                  sort_keys=True, indent=2, separators=(',', ':'))))
+    else:
+        print('Messenger BOT API: post a 1 to 1 message failure:',
+              response.status_code, response.reason)
+        print('Text:', response.text)
 
 
 # Posting Messages to a Chatroom via HTTP REST
@@ -296,6 +328,11 @@ if __name__ == '__main__':
         sys.exit(1)
 
     print('Successfully Authenticated ')
+
+    # Send 1 to 1 message to reipient without a chat room
+    text_to_post = 'Hello from Python'
+    print('send 1 to 1 message to %s ' % (recipient_email))
+    post_direct_message(access_token, recipient_email, text_to_post)
 
     # List associated Chatrooms
     print('Get Rooms ')

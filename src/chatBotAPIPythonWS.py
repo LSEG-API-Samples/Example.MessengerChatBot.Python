@@ -22,11 +22,13 @@ import logging
 from rdpToken import RDPTokenManagement
 
 # Input your Bot Username
-bot_username = 'XXXXX'
+bot_username = 'XXXX'
 # Input Bot Password
-bot_password = 'XXXXX'
+bot_password = 'XXXX'
 # Input your Messenger account AppKey.
-app_key = 'XXXXX'
+app_key = 'XXXX'
+# Input your Messenger Application account email
+recipient_email = 'XXXX'
 # Setting Log level the supported value is 'logging.WARN' and 'logging.DEBUG'
 log_level = logging.WARN
 
@@ -48,7 +50,7 @@ bot_api_base_path = '/messenger/beta1'
 
 
 def authen_rdp(rdp_token_object):  # Call RDPTokenManagement to get authentication
-    auth_token = rdp_token_object.get_token()
+    auth_token = rdp_token_object.get_token(save_token_to_file=False)
     if auth_token:
         # return RDP access token (sts_token) , expire_in values and RDP login status
         return auth_token['access_token'], auth_token['expires_in'], True

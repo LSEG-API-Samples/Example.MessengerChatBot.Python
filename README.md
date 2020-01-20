@@ -75,7 +75,7 @@ Once you have setup your Messenger user and Bot user, you can add the Bot and cr
 ## <a id="running-rest"></a>Running the REST API demo application
 1. Unzip or download the tutorial project folder into a directory of your choice 
 2. Open a command prompt or console and go to folder *src*.
-3. Run ```$> pip install -r rest-requirements.txt``` command in a console to install all the dependencies libraries.
+3. Run ```$>pip install -r rest-requirements.txt``` command in a console to install all the dependencies libraries.
 4. Open the *chatBotAPIPythonREST.py** demo application source code with your editor and input the following parameters
     - ```app_key```: Your AppKey
     - ```bot_username```: Your Bot username
@@ -114,7 +114,7 @@ Once you have setup your Messenger user and Bot user, you can add the Bot and cr
 ## <a id="running-ws"></a>Running the WebSocket API demo application
 1. Unzip or download the tutorial project folder into a directory of your choice. 
 2. Open a command prompt or console and go to folder *src*.
-3. Run ```$> pip install -r ws-requirements.txt``` command in a console to install all the dependencies libraries.
+3. Run ```$>pip install -r ws-requirements.txt``` command in a console to install all the dependencies libraries.
 4. Open the *chatBotAPIPythonWS.py** demo application source code with your editor and input the following parameters
     - ```app_key```: Your AppKey
     - ```bot_username```: Your Bot username
@@ -140,9 +140,9 @@ Once you have setup your Messenger user and Bot user, you can add the Bot and cr
     ![Figure-7](images/eikon_msg_complex_msg.png "Complex message") 
 
 ## <a id="running-debug"></a>Running demo applications with debug log
-You can enable the REST and WebSocket application debug log level via ```log_level = logging.WARN``` application source code statement.The supported value is *logging.WARN* and *logging.DEBUG* levels.
+You can enable the REST and WebSocket application debug log level via ```log_level = logging.WARN``` application source code statement.The supported values are *logging.WARN* and *logging.DEBUG* levels.
 
-The *logging.DEBUG* level show incoming and outgoing messages between the demo applications and Messenger BOT API REST and WebSocket servers.
+The *logging.DEBUG* level shows incoming and outgoing messages between the demo applications and Messenger BOT API REST and WebSocket servers.
 
 ## <a id="author"></a>Authors
 - Wasin Waeosri (wasin.waeosri@refinitiv.com)

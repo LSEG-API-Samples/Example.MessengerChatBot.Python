@@ -31,12 +31,12 @@ class RDPTokenManagement:
     rdp_authen_version = '/v1'
     base_URL = 'https://api.refinitiv.com'
     category_URL = '/auth/oauth2'
-    #endpoint_URL = '/token'
-    token_file = './token.txt'
+    # endpoint_URL = '/token'
+    token_file = './rest-token.txt'
     scope = 'trapi.messenger'
 
     # Create RDP Authentication service URL
-    #authen_URL = base_URL + category_URL + rdp_authen_version + endpoint_URL
+    # authen_URL = base_URL + category_URL + rdp_authen_version + endpoint_URL
     authen_URL = '{}{}{}/token'.format(base_URL,
                                        category_URL, rdp_authen_version)
 
@@ -94,7 +94,7 @@ class RDPTokenManagement:
                   response.status_code, response.reason)
             print('Text:', response.text)
             # both access and refresh tokens are expired
-            if response.status_code == 400 and response.json()['error'] == 'invalid_grant':
+            if response.status_code == 400 and (response.json()['error'] == 'invalid_grant' or response.json()['error_description'] == 'Refresh token does not exist.'):
                 print('Both Access Token and Refresh Token are expired')
                 raise Exception('Both Access Token and Refresh Token are expired {0} - {1}'
                                 .format(response.status_code, response.text))
@@ -154,20 +154,31 @@ class RDPTokenManagement:
 
             json.dump(_authen_obj, saved_token, indent=4)
 
-    # Get RDP Authentication Token from './token.txt' file first.
-    # If token expire or not exist, request a new token
-    def get_token(self):
+    """
+    Get RDP Authentication Token.
+    Use save_token_to_file variable to verify if read and write RDP token to './rest-token.txt' file or not.
+    
+    - REST application: save_token_to_file = True. Get previous token from a file first. If token expire or not exist, request a new token. Once authentication is granted, saved Token information to a file for later use.
+    - WebSocket application: save_token_to_file = False. Always request a new token to RDP without read/save a token file due to WebSocket application behavior.
+    
+    """
+
+    def get_token(self, save_token_to_file=True):
         is_request_error = False
         try:
-            print('Checking RDP token information in %s' % (self.token_file))
-            with open(self.token_file, 'r+') as saved_token:  # Open './token.txt' file
-                auth_obj = json.load(saved_token)
-                if auth_obj['expires_tm'] > time.time():  # Access Token is still active
-                    print('Token is still active')
-                    return auth_obj
+            if save_token_to_file:
+                print('Checking RDP token information in %s' %
+                      (self.token_file))
+                with open(self.token_file, 'r+') as saved_token:  # Open './token.txt' file
+                    auth_obj = json.load(saved_token)
+                    if auth_obj['expires_tm'] > time.time():  # Access Token is still active
+                        print('Token is still active')
+                        return auth_obj
+                    else:
+                        # Access Token expire
+                        print(
+                            'Token expired, request a new Token with a refresh token')
 
-            # Access Token expire
-            print('Token expired, request a new Token with a refresh token')
             status, auth_obj = self.request_new_token(
                 auth_obj['refresh_token'])
         except IOError as e:
@@ -186,7 +197,8 @@ class RDPTokenManagement:
             status, auth_obj = self.request_new_token(None)
 
         if status == 200:  # HTTP Status 'OK'
-            self.save_authen_to_file(auth_obj)
+            if save_token_to_file:
+                self.save_authen_to_file(auth_obj)
             return auth_obj
         else:
             return None
@@ -208,6 +220,7 @@ if __name__ == '__main__':
     rdp_token = RDPTokenManagement(
         _username, _password, _app_key, logging.WARN)
     auth_obj = rdp_token.get_token()
+    # auth_obj = rdp_token.get_token(save_token_to_file=False)
     if auth_obj:
         print('access token = %s' % auth_obj['access_token'])
         print('refresh token = %s' % auth_obj['refresh_token'])

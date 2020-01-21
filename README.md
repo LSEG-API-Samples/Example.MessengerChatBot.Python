@@ -1,16 +1,17 @@
-# Messenger Bot API Tutorial
+# Messenger Bot API Demo Applications with Python
 - Last update: January 2020
 - Environment: Windows
 - Compiler: Python
-- Prerequisite: [Access to Eikon Messenger](#prerequisite)
+- Prerequisite: [Access to Messenger application](#prerequisite)
 
-## Introduction
+## Messenger Bot API Introduction
 
-[Eikon Messenger](https://www.refinitiv.com/en/products/eikon-trading-software/eikon-messenger-securemessaging) is a free to use, compliant and secure messaging platform.  It is a powerful communication tool that provides desktop, mobile, and web access, and allows sharing messages, data, files, screenshots, and emoticons with your contacts.
+Refinitiv's [Messenger application](https://www.refinitiv.com/en/products/eikon-trading-software/eikon-messenger-securemessaging) is a free to use, compliant and secure messaging platform.  It is a powerful communication tool that provides desktop, mobile, and web access, and allows sharing messages, data, files, screenshots, and emoticons with your contacts.
 
-The [Messenger Bot API](https://developers.refinitiv.com/messenger-api) provides a set of available API calls to build automated workflows or bots for Eikon Messenger. The Bot API allows your applications to connect with and pass information into Eikon’s Messenger service programmatically or interact with a bot via a WebSocket connection.
+The [Messenger Bot API](https://developers.refinitiv.com/messenger-api) provides a set of available API calls to build automated workflows or bots for the Messenger application. The Bot API allows your applications to connect with and pass information into Eikon’s Messenger service programmatically or interact with a bot via a WebSocket connection.
 
 ## Table of contents
+* [Overview](#overview)
 * [Prerequisite](#prerequisite)
 * [Getting the AppKey value](#appkey)
 * [Setting the Messenger application](#setting)
@@ -20,15 +21,24 @@ The [Messenger Bot API](https://developers.refinitiv.com/messenger-api) provides
 * [Authors](#author)
 * [References](#references)
 
+## <a id="overview"></a>Messenger Bot API Demo overview
+
+This demo project shows how to implement the Messenger BOT API console applications with the REST and WebSocket APIs in [Python](https://www.python.org/) programming language. The applications makes an authentication with [RDP](https://developers.refinitiv.com/refinitiv-data-platform/refinitiv-data-platform-apis) Authentication service, then lets developers interact with Messeger Application/Chatroom on behalf of Bot via the REST and WebSocket APIs. 
+- *chatBotAPIPythonREST.py*: A REST API example that sends chat message to individual and a Chatroom. 
+- *chatBotAPIPythonWS.py*: A REST and WebSocket APIs example that sends and receives chat message with a Chatroom. 
+- *rdpToken.py*: A Python module that manages RDP Authentication process for chatBotAPIPythonREST.py and chatBotAPIPythonWS.py applications. 
+
+Note: Please note that the main concept for using Messager Bot REST and WebSocket APIs are the same for all technologies (see [JavaScript example](https://github.com/Refinitiv-API-Samples/Tutorial.MessengerChatBot.JavaScript)). 
+
 ## <a id="prerequisite"></a>Prerequisite 
 This tutorial source code requires the following dependencies.
-1. [Eikon Messenger](https://www.refinitiv.com/en/products/eikon-trading-software/eikon-messenger-securemessaging).
+1. [Messenger application](https://www.refinitiv.com/en/products/eikon-trading-software/eikon-messenger-securemessaging).
 2. [Python](https://www.python.org/) compiler and runtime
 3. Python's [requests 2.x](https://pypi.org/project/requests/) library for both REST and WebSocket connections.
 4. Python's [websocket-client](https://pypi.org/project/websocket-client/) library (*version 0.49 or greater*) for the WebSocket connection .
-4. Eikon Messenger Bot API access and license.
+4. Messenger Bot API access and license.
 
-Please contact your Refinitiv's representative and Dino Diviacchi (dino.diviacchi@refinitiv.com) to help you to access Eikon Message and Bot API. The Refinitiv team will then provision and set up the bot. Once this is done the email user you provided will receive an automated email with how to set up a password for the bot.
+Please contact your Refinitiv's representative and Dino Diviacchi (dino.diviacchi@refinitiv.com) to help you to access Messenger application and Bot API. The Refinitiv team will then provision and set up the bot. Once this is done the email user you provided will receive an automated email with how to set up a password for the bot.
 
 *Note:* 
 - The Python example has been qualified with Python versions 3.6.5
@@ -37,7 +47,7 @@ Please contact your Refinitiv's representative and Dino Diviacchi (dino.diviacch
 
 ## <a id="appkey"></a>Getting the AppKey value
 
-Once you have setup your Eikon Messenger user, please access the AppKey Generator Tool via Eikon Desktop/Refinitiv Workspace application (go to the Search Bar and type ```APP KEY```, then select the AppKey Generator) or via a <a href="https://amers1.apps.cp.thomsonreuters.com/apps/AppkeyGenerator">web site</a> (Please access with your Eikon account, *not your bot account*). 
+Once you have setup your Messenger user, please access the AppKey Generator Tool via Eikon Desktop/Refinitiv Workspace application (go to the Search Bar and type ```APP KEY```, then select the AppKey Generator) or via a <a href="https://amers1.apps.cp.thomsonreuters.com/apps/AppkeyGenerator">web site</a> (Please access with your Eikon account, *not your bot account*). 
 
 ![Figure-1](images/app_key_generator.png "AppKey Generator Tool") 
 
@@ -50,9 +60,9 @@ You will then see a row for your new app with an AppKey item, which is your clie
 
 ## <a id="setting"></a>Setting the Messenger application
 
-Once you have setup your Eikon Messenger user and Bot user, you can add the Bot and create a Chatroom for you and your Bot via the following steps
+Once you have setup your Messenger user and Bot user, you can add the Bot and create a Chatroom for you and your Bot via the following steps
 
-1. Login to your personal Eikon Messenger to add the bot to your contacts, using “Add a New Contact” from the menu in the lower left corner.
+1. Login to your personal Messenger to add the bot to your contacts, using “Add a New Contact” from the menu in the lower left corner.
 
     ![Figure-2](images/eikon_msg_addbot1.png "Add a New Contact") 
 
@@ -74,17 +84,18 @@ Once you have setup your Eikon Messenger user and Bot user, you can add the Bot 
 
 ## <a id="running-rest"></a>Running the REST API demo application
 1. Unzip or download the tutorial project folder into a directory of your choice 
-2. Run ```$> pip install -r rest-requestments.txt``` command in a console to install all the dependencies libraries.
-3. Open the *chatBotAPIPythonREST.py** demo application source code with your editor and input the following parameters
+2. Open a command prompt or console and go to folder *src*.
+3. Run ```$>pip install -r rest-requirements.txt``` command in a console to install all the dependencies libraries.
+4. Open the *chatBotAPIPythonREST.py** demo application source code with your editor and input the following parameters
     - ```app_key```: Your AppKey
     - ```bot_username```: Your Bot username
     - ```bot_password```: Your Bot password
-    - ```recipient_email``` : Your assoicate Eikon messenger email address 
-4. Open a command prompt and folder *src* and run the demo application with the following command.
+    - ```recipient_email``` : Your assoicate Messenger email address 
+5. Open a command prompt and folder *src* and run the demo application with the following command.
     ```
     $>python chatBotAPIPythonREST.py
     ```
-5. The application then authenticates with [RDP](https://developers.refinitiv.com/refinitiv-data-platform) Authentication service and sends a 1-1 message to your assoicate Eikon message email address. 
+6. The application then authenticates with [RDP](https://developers.refinitiv.com/refinitiv-data-platform) Authentication service and sends a 1-1 message to your assoicate Eikon message email address. 
     ```
     Getting RDP Authentication Token
 
@@ -93,14 +104,14 @@ Once you have setup your Eikon Messenger user and Bot user, you can add the Bot 
     send 1 to 1 message to <email>
     Messenger BOT API: post a 1 to 1 message to <email> success
     ```
-6. Then a demo gets an associate Chatroom and joining to that Chatroom.
+7. Then a demo gets an associate Chatroom and joining to that Chatroom.
     ```
     Get Rooms
     Messenger BOT API: get chatroom  success
     Join Rooms
     Messenger BOT API: join chatroom success
     ```
-7. The demo application will send a default ```Hello from Python``` message to a Chatroom on behalf of the Bot API and lets you send your own message before leaving a Chatroom.
+8. The demo application will send a default ```Hello from Python``` message to a Chatroom on behalf of the Bot API and lets you send your own message before leaving a Chatroom.
     ```
     sending message to {...} Rooms
     Messenger BOT API: post message to chatroom success
@@ -109,19 +120,22 @@ Once you have setup your Eikon Messenger user and Bot user, you can add the Bot 
     Leave Rooms
     Messenger BOT API: leave chatroom success
     ```
+
 ## <a id="running-ws"></a>Running the WebSocket API demo application
-1. Unzip or download the tutorial project folder into a directory of your choice 
-2. Run ```$> pip install -r ws-requestments.txt``` command in a console to install all the dependencies libraries.
-3. Open the *chatBotAPIPythonWS.py** demo application source code with your editor and input the following parameters
+1. Unzip or download the tutorial project folder into a directory of your choice. 
+2. Open a command prompt or console and go to folder *src*.
+3. Run ```$>pip install -r ws-requirements.txt``` command in a console to install all the dependencies libraries.
+4. Open the *chatBotAPIPythonWS.py** demo application source code with your editor and input the following parameters
     - ```app_key```: Your AppKey
     - ```bot_username```: Your Bot username
     - ```bot_password```: Your Bot password
-4. Open a command prompt and folder *src* and run the demo application with the following command.
+    - ```recipient_email``` : Your assoicate Messenger email address (For 1 to 1 message)
+5. Open a command prompt and folder *src* and run the demo application with the following command.
     ```
     $>python chatBotAPIPythonWS.py
     ```
-5. The demo will perform authentication process, get an assoicate chatroom, then join that chatroom as same as the REST API demo application [above](#running-rest)
-6. Then demo connects to Eikon messenger WebSocket server. Once the application shows WebSocket ```connected``` event in a console, you can start interact with your bot via a chatroom.
+6. The demo will perform authentication process, get an assoicate chatroom, then join that chatroom as same as the REST API demo application [above](#running-rest)
+7. Then demo connects to the Messenger BOT API WebSocket server. Once the application shows WebSocket ```connected``` event in a console, you can start interact with your bot via a chatroom.
     ```
     Messenger BOT API: join chatroom success
     Connecting to WebSocket wss://api.collab.refinitiv.com/services/nt/api/messenger/v1/stream ...
@@ -133,13 +147,14 @@ Once you have setup your Eikon Messenger user and Bot user, you can add the Bot 
     "reqId":"943378"
     }
     ```
-8. Eikon Messenger supports tabular data, hyperlinks and a full set of emoji in the message. You can type ```/complex_message``` message into a Chatroom to see an example.
+8. Now we should be able to receive a response from our chatbot. The Messenger application supports tabular data, hyperlinks and a full set of emoji in the message. You can type ```/complex_message``` message into a Chatroom to see an example.
     ![Figure-7](images/eikon_msg_complex_msg.png "Complex message") 
+9. The Messenger Bot API can retrieve sender information when user sends a message in to a Chatroom. You can test by sending ```hello``` message in to a Chatroom to see an example.
 
 ## <a id="running-debug"></a>Running demo applications with debug log
-You can enable the REST and WebSocket application debug log level via ```log_level = logging.WARN``` application source code statement.The supported value is *logging.WARN* and *logging.DEBUG* levels.
+You can enable the REST and WebSocket application debug log level via ```log_level = logging.WARN``` application source code statement.The supported values are *logging.WARN* and *logging.DEBUG* levels.
 
-The *logging.DEBUG* level show incoming and outgoing messages between the demo applications and Eikon Messenger REST and WebSocket APIs servers.
+The *logging.DEBUG* level shows incoming and outgoing messages between the demo applications and Messenger BOT API REST and WebSocket servers.
 
 ## <a id="author"></a>Authors
 - Wasin Waeosri (wasin.waeosri@refinitiv.com)
@@ -150,3 +165,4 @@ For further details, please check out the following resources:
 * [Refinitiv Messenger Bot API page](https://developers.refinitiv.com/messenger-api) on the [Refinitiv Developer Community](https://developers.refinitiv.com/) web site.
 * [Refinitiv Messenger Bot API: Quick Start](https://developers.refinitiv.com/messenger-api/messenger-bot-api/quick-start). 
 * [Refinitiv Messenger Bot API: Documentation page](https://developers.refinitiv.com/messenger-api/messenger-bot-api/docs).
+* [Refinitiv Messenger Bot API Demo application - JavaScript](https://github.com/Refinitiv-API-Samples/Tutorial.MessengerChatBot.JavaScript)

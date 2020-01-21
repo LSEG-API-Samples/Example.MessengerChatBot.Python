@@ -3,4 +3,5 @@ documents/
 internal_dev/
 chatbot_pythonenv/
 src/token.txt
+src/rest-token.txt
 src/__pycache__

@@ -27,6 +27,8 @@ bot_username = 'XXXXX'
 bot_password = 'XXXXX'
 # Input your Messenger account AppKey.
 app_key = 'XXXXX'
+# Input your Messenger Application account email
+recipient_email = 'XXXXX'
 # Setting Log level the supported value is 'logging.WARN' and 'logging.DEBUG'
 log_level = logging.WARN
 
@@ -46,9 +48,12 @@ ws_url = 'wss://api.collab.refinitiv.com/services/nt/api/messenger/v1/stream'
 gw_url = 'https://api.refinitiv.com'
 bot_api_base_path = '/messenger/beta1'
 
+# =============================== RDP and Messenger BOT API functions ========================================
+
 
 def authen_rdp(rdp_token_object):  # Call RDPTokenManagement to get authentication
-    auth_token = rdp_token_object.get_token()
+    # Based on WebSocket application behavior, the Authentication will not read/write Token from rest-token.txt file
+    auth_token = rdp_token_object.get_token(save_token_to_file=False)
     if auth_token:
         # return RDP access token (sts_token) , expire_in values and RDP login status
         return auth_token['access_token'], auth_token['expires_in'], True
@@ -111,6 +116,38 @@ def join_chatroom(access_token, room_id=None, room_is_managed=False):  # Join ch
         print('Text:', response.text)
 
     return joined_rooms
+
+
+# send 1 to 1 message to recipient email directly without a Chatroom via BOT
+def post_direct_message(access_token, contact_email='', text=''):
+    url = '{}{}/message'.format(gw_url, bot_api_base_path)
+
+    body = {
+        'recipientEmail': contact_email,
+        'message': text
+    }
+
+    # Print for debugging purpose
+    logging.debug('Sent: %s' % (json.dumps(
+        body, sort_keys=True, indent=2, separators=(',', ':'))))
+
+    try:
+        # Send a HTTP request message with Python requests module
+        response = requests.post(
+            url=url, data=json.dumps(body), headers={'Authorization': 'Bearer {}'.format(access_token)})
+    except requests.exceptions.RequestException as e:
+        print('Messenger BOT API: post a 1 to 1 message exception failure:', e)
+
+    if response.status_code == 200:  # HTTP Status 'OK'
+        print('Messenger BOT API: post a 1 to 1 message to %s success' %
+              (contact_email))
+        # Print for debugging purpose
+        logging.debug('Receive: %s' % (json.dumps(response.json(),
+                                                  sort_keys=True, indent=2, separators=(',', ':'))))
+    else:
+        print('Messenger BOT API: post a 1 to 1 message failure:',
+              response.status_code, response.reason)
+        print('Text:', response.text)
 
 
 # Posting Messages to a Chatroom via HTTP REST
@@ -263,12 +300,17 @@ def process_message(message_json):  # Process incoming message from a joined Cha
                 post_message_to_chatroom(
                     access_token, joined_rooms, chatroom_id, 'What would you like help with?\n ')
             # Sending tabular data, hyperlinks and a full set of emoji in a message to a Chatroom
-            elif incoming_msg == '/complex_message':
+            elif incoming_msg.lower() == '/complex_message':
                 complex_msg = """
                 USD BBL EU AM Assessment at 11:30 UKT\nName\tAsmt\t10-Apr-19\tFair Value\t10-Apr-19\tHst Cls\nBRT Sw APR19\t70.58\t05:07\t(up) 71.04\t10:58\t70.58\nBRTSw MAY19\t70.13\t05:07\t(dn) 70.59\t10:58\t70.14\nBRT Sw JUN19\t69.75\t05:07\t(up)70.2\t10:58\t69.76
                 """
                 post_message_to_chatroom(
                     access_token, joined_rooms, chatroom_id, complex_msg)
+            # Receive 'Hello' message, get sender email address and say hello back
+            elif incoming_msg.lower() == 'hello':
+                sender = message_json['post']['sender']['email']
+                post_message_to_chatroom(
+                    access_token, joined_rooms, chatroom_id, 'Hello %s\n ' % (sender))
 
         except Exception as error:
             print('Post meesage to a Chatroom fail :', error)
@@ -294,6 +336,10 @@ if __name__ == '__main__':
         sys.exit(1)
 
     print('Successfully Authenticated ')
+
+    # Send 1 to 1 message to reipient without a chat room
+    print('send 1 to 1 message to %s ' % (recipient_email))
+    post_direct_message(access_token, recipient_email, 'Hello from Python')
 
     # List associated Chatrooms
     print('Get Rooms ')

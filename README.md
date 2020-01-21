@@ -147,9 +147,9 @@ Once you have setup your Messenger user and Bot user, you can add the Bot and cr
     "reqId":"943378"
     }
     ```
-8. Now we should be able to receive a response from our chatbot. The Messenger application supports tabular data, hyperlinks and a full set of emoji in the message. You can type ```/complex_message``` message into a Chatroom to see an example.
+8. Now we should be able to receive a response from our chatbot. You can test by sending ```hello``` message in to a Chatroom to see an example.
+9. The Messenger application supports tabular data, hyperlinks and a full set of emoji in the message. You can type ```/complex_message``` message into a Chatroom to see an example.
     ![Figure-7](images/eikon_msg_complex_msg.png "Complex message") 
-9. The Messenger Bot API can retrieve sender information when user sends a message in to a Chatroom. You can test by sending ```hello``` message in to a Chatroom to see an example.
 
 ## <a id="running-debug"></a>Running demo applications with debug log
 You can enable the REST and WebSocket application debug log level via ```log_level = logging.WARN``` application source code statement.The supported values are *logging.WARN* and *logging.DEBUG* levels.

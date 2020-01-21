@@ -1,16 +1,17 @@
-# Messenger Bot API Tutorial
+# Messenger Bot API Demo Applications with Python
 - Last update: January 2020
 - Environment: Windows
 - Compiler: Python
 - Prerequisite: [Access to Messenger application](#prerequisite)
 
-## Introduction
+## Messenger Bot API Introduction
 
 Refinitiv's [Messenger application](https://www.refinitiv.com/en/products/eikon-trading-software/eikon-messenger-securemessaging) is a free to use, compliant and secure messaging platform.  It is a powerful communication tool that provides desktop, mobile, and web access, and allows sharing messages, data, files, screenshots, and emoticons with your contacts.
 
 The [Messenger Bot API](https://developers.refinitiv.com/messenger-api) provides a set of available API calls to build automated workflows or bots for the Messenger application. The Bot API allows your applications to connect with and pass information into Eikon’s Messenger service programmatically or interact with a bot via a WebSocket connection.
 
 ## Table of contents
+* [Overview](#overview)
 * [Prerequisite](#prerequisite)
 * [Getting the AppKey value](#appkey)
 * [Setting the Messenger application](#setting)
@@ -19,6 +20,15 @@ The [Messenger Bot API](https://developers.refinitiv.com/messenger-api) provides
 * [Running demo applications with debug log](#running-debug)
 * [Authors](#author)
 * [References](#references)
+
+## <a id="overview"></a>Messenger Bot API Demo overview
+
+This demo project shows how to implement the Messenger BOT API console applications with the REST and WebSocket APIs in [Python](https://www.python.org/) programming language. The applications makes an authentication with [RDP](https://developers.refinitiv.com/refinitiv-data-platform/refinitiv-data-platform-apis) Authentication service, then lets developers interact with Messeger Application/Chatroom on behalf of Bot via the REST and WebSocket APIs. 
+- *chatBotAPIPythonREST.py*: A REST API example that sends chat message to individual and a Chatroom. 
+- *chatBotAPIPythonWS.py*: A REST and WebSocket APIs example that sends and receives chat message with a Chatroom. 
+- *rdpToken.py*: A Python module that manages RDP Authentication process for chatBotAPIPythonREST.py and chatBotAPIPythonWS.py applications. 
+
+Note: Please note that the main concept for using Messager Bot REST and WebSocket APIs are the same for all technologies (see [JavaScript example](https://github.com/Refinitiv-API-Samples/Tutorial.MessengerChatBot.JavaScript)). 
 
 ## <a id="prerequisite"></a>Prerequisite 
 This tutorial source code requires the following dependencies.
@@ -119,6 +129,7 @@ Once you have setup your Messenger user and Bot user, you can add the Bot and cr
     - ```app_key```: Your AppKey
     - ```bot_username```: Your Bot username
     - ```bot_password```: Your Bot password
+    - ```recipient_email``` : Your assoicate Messenger email address (For 1 to 1 message)
 5. Open a command prompt and folder *src* and run the demo application with the following command.
     ```
     $>python chatBotAPIPythonWS.py
@@ -138,6 +149,7 @@ Once you have setup your Messenger user and Bot user, you can add the Bot and cr
     ```
 8. Now we should be able to receive a response from our chatbot. The Messenger application supports tabular data, hyperlinks and a full set of emoji in the message. You can type ```/complex_message``` message into a Chatroom to see an example.
     ![Figure-7](images/eikon_msg_complex_msg.png "Complex message") 
+9. The Messenger Bot API can retrieve sender information when user sends a message in to a Chatroom. You can test by sending ```hello``` message in to a Chatroom to see an example.
 
 ## <a id="running-debug"></a>Running demo applications with debug log
 You can enable the REST and WebSocket application debug log level via ```log_level = logging.WARN``` application source code statement.The supported values are *logging.WARN* and *logging.DEBUG* levels.
@@ -153,3 +165,4 @@ For further details, please check out the following resources:
 * [Refinitiv Messenger Bot API page](https://developers.refinitiv.com/messenger-api) on the [Refinitiv Developer Community](https://developers.refinitiv.com/) web site.
 * [Refinitiv Messenger Bot API: Quick Start](https://developers.refinitiv.com/messenger-api/messenger-bot-api/quick-start). 
 * [Refinitiv Messenger Bot API: Documentation page](https://developers.refinitiv.com/messenger-api/messenger-bot-api/docs).
+* [Refinitiv Messenger Bot API Demo application - JavaScript](https://github.com/Refinitiv-API-Samples/Tutorial.MessengerChatBot.JavaScript)

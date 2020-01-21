@@ -6,7 +6,7 @@
 # |-----------------------------------------------------------------------------
 
 # |-----------------------------------------------------------------------------
-# |            Refinitiv Data Platform demo app to get OAuth tokens           --
+# |         Refinitiv Data Platform demo app/module to get OAuth tokens       --
 # |-----------------------------------------------------------------------------
 
 # Import the required libraries for HTTP/JSON operations

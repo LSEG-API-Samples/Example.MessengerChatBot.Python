@@ -26,7 +26,7 @@ The [Messenger Bot API](https://developers.refinitiv.com/messenger-api) provides
 This demo project shows how to implement the Messenger BOT API console applications with the REST and WebSocket APIs in [Python](https://www.python.org/) programming language. The applications makes an authentication with [RDP](https://developers.refinitiv.com/refinitiv-data-platform/refinitiv-data-platform-apis) Authentication service, then lets developers interact with Messeger Application/Chatroom on behalf of Bot via the REST and WebSocket APIs. 
 - *chatBotAPIPythonREST.py*: A REST API example that sends chat message to individual and a Chatroom. 
 - *chatBotAPIPythonWS.py*: A REST and WebSocket APIs example that sends and receives chat message with a Chatroom. 
-- *rdpToken.py*: A Python module that manages RDP Authentication process for chatBotAPIPythonREST.py and chatBotAPIPythonWS.py applications. 
+- *rdpToken.py*: A Python module that manages RDP Authentication process for chatBotAPIPythonREST.py and chatBotAPIPythonWS.py applications. This module is based on [RDP Python Quickstart Python source code](https://developers.refinitiv.com/refinitiv-data-platform/refinitiv-data-platform-apis/downloads) implemented by Gurpreet Bal.
 
 Note: Please note that the main concept for using Messager Bot REST and WebSocket APIs are the same for all technologies (see [JavaScript example](https://github.com/Refinitiv-API-Samples/Tutorial.MessengerChatBot.JavaScript)). 
 

@@ -22,13 +22,13 @@ import logging
 from rdpToken import RDPTokenManagement
 
 # Input your Bot Username
-bot_username = 'XXXXX'
+bot_username = '---YOUR BOT USERNAME---'
 # Input Bot Password
-bot_password = 'XXXXX'
+bot_password = '---YOUR BOT PASSWORD---'
 # Input your Messenger account AppKey.
-app_key = 'XXXXX'
+app_key = '---YOUR MESSENGER ACCOUNT APPKEY---'
 # Input your Messenger Application account email
-recipient_email = 'XXXXX'
+recipient_email = '---YOUR MESSENGER ACCOUNT EMAIL---'
 # Setting Log level the supported value is 'logging.WARN' and 'logging.DEBUG'
 log_level = logging.WARN
 

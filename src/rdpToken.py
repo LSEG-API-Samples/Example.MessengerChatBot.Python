@@ -204,7 +204,7 @@ class RDPTokenManagement:
             return None
 
 
-# =============================================================================
+# =============================== Main Process, For verifying your RDP Account purpose ============================
 if __name__ == '__main__':
 
     logging.basicConfig(
@@ -213,9 +213,14 @@ if __name__ == '__main__':
     print('Getting RDP Authentication Token')
 
     # Authentication Variables
-    _username = 'XXXXX'
-    _password = 'XXXXX'
-    _app_key = 'XXXXX'
+    _username = '---YOUR RDP USERNAM---'
+    _password = '---YOUR PASSWORD---'
+    _app_key = '---YOUR GENERATED CLIENT ID---'
+
+    """
+    Input above RDP credentials information and run this module with the following command in a console
+    $>python rdpToken.py
+    """
 
     rdp_token = RDPTokenManagement(
         _username, _password, _app_key, logging.WARN)

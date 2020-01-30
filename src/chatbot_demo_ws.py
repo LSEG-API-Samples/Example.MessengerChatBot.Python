@@ -19,7 +19,7 @@ import websocket
 import threading
 import random
 import logging
-from rdpToken import RDPTokenManagement
+from rdp_token import RDPTokenManagement
 
 # Input your Bot Username
 bot_username = '---YOUR BOT USERNAME---'

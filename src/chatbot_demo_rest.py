@@ -13,7 +13,7 @@ import requests
 import json
 import sys
 import logging
-from rdpToken import RDPTokenManagement
+from rdp_token import RDPTokenManagement
 
 # Input your Bot Username
 bot_username = '---YOUR BOT USERNAME---'

@@ -213,7 +213,7 @@ if __name__ == '__main__':
     print('Getting RDP Authentication Token')
 
     # Authentication Variables
-    _username = '---YOUR RDP USERNAM---'
+    _username = '---YOUR RDP USERNAME---'
     _password = '---YOUR PASSWORD---'
     _app_key = '---YOUR GENERATED CLIENT ID---'
 

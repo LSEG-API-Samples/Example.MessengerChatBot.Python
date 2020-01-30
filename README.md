@@ -87,7 +87,7 @@ Once you have setup your Messenger user and Bot user, you can add the Bot and cr
 1. Unzip or download the tutorial project folder into a directory of your choice 
 2. Open a command prompt or console.
 3. Run ```$>pip install -r rest-requirements.txt``` command in a console to install all the dependencies libraries.
-4. Open the *chatBotAPIPythonREST.py** demo application source code with your editor and input the following parameters
+4. Open the *chatbot_demo_rest.py* demo application source code with your editor and input the following parameters
     - ```app_key```: Your AppKey
     - ```bot_username```: Your Bot username
     - ```bot_password```: Your Bot password
@@ -126,7 +126,7 @@ Once you have setup your Messenger user and Bot user, you can add the Bot and cr
 1. Unzip or download the tutorial project folder into a directory of your choice. 
 2. Open a command prompt or console.
 3. Run ```$>pip install -r ws-requirements.txt``` command in a console to install all the dependencies libraries.
-4. Open the *chatBotAPIPythonWS.py** demo application source code with your editor and input the following parameters
+4. Open the *chatbot_demo_ws.py* demo application source code with your editor and input the following parameters
     - ```app_key```: Your AppKey
     - ```bot_username```: Your Bot username
     - ```bot_password```: Your Bot password

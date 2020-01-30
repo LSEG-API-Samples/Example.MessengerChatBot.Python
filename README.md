@@ -24,9 +24,9 @@ The [Messenger Bot API](https://developers.refinitiv.com/messenger-api) provides
 ## <a id="overview"></a>Messenger Bot API Demo overview
 
 This demo project shows how to implement the Messenger BOT API console applications with the REST and WebSocket APIs in [Python](https://www.python.org/) programming language. The applications makes an authentication with [RDP](https://developers.refinitiv.com/refinitiv-data-platform/refinitiv-data-platform-apis) Authentication service, then lets developers interact with Messeger Application/Chatroom on behalf of Bot via the REST and WebSocket APIs. 
-- *chatBotAPIPythonREST.py*: A REST API example that sends chat message to individual and a Chatroom. 
-- *chatBotAPIPythonWS.py*: A REST and WebSocket APIs example that sends and receives chat message with a Chatroom. 
-- *rdpToken.py*: A Python module that manages RDP Authentication process for chatBotAPIPythonREST.py and chatBotAPIPythonWS.py applications. This module is based on [RDP Python Quickstart Python source code](https://developers.refinitiv.com/refinitiv-data-platform/refinitiv-data-platform-apis/downloads) implemented by Gurpreet Bal.
+- *chatbot_demo_rest.py*: A REST API example that sends chat message to individual and a Chatroom. 
+- *chatbot_demo_ws.py*: A REST and WebSocket APIs example that sends and receives chat message with a Chatroom. 
+- *rdp_token.py*: A Python module that manages RDP Authentication process for chatbot_demo_rest.py and chatbot_demo_ws.py applications. This module is based on [RDP Python Quickstart Python source code](https://developers.refinitiv.com/refinitiv-data-platform/refinitiv-data-platform-apis/downloads) implemented by Gurpreet Bal.
 
 Note: Please note that the main concept for using Messager Bot REST and WebSocket APIs are the same for all technologies (see [JavaScript example](https://github.com/Refinitiv-API-Samples/Tutorial.MessengerChatBot.JavaScript)). 
 
@@ -84,16 +84,16 @@ Once you have setup your Messenger user and Bot user, you can add the Bot and cr
 
 ## <a id="running-rest"></a>Running the REST API demo application
 1. Unzip or download the tutorial project folder into a directory of your choice 
-2. Open a command prompt or console and go to folder *src*.
+2. Open a command prompt or console.
 3. Run ```$>pip install -r rest-requirements.txt``` command in a console to install all the dependencies libraries.
 4. Open the *chatBotAPIPythonREST.py** demo application source code with your editor and input the following parameters
     - ```app_key```: Your AppKey
     - ```bot_username```: Your Bot username
     - ```bot_password```: Your Bot password
     - ```recipient_email``` : Your assoicate Messenger email address 
-5. Open a command prompt and folder *src* and run the demo application with the following command.
+5. OOpen a command prompt and go to folder *src*, then run the demo application with the following command.
     ```
-    $>python chatBotAPIPythonREST.py
+    $>python chatbot_demo_rest.py
     ```
 6. The application then authenticates with [RDP](https://developers.refinitiv.com/refinitiv-data-platform) Authentication service and sends a 1-1 message to your assoicate Eikon message email address. 
     ```
@@ -123,16 +123,16 @@ Once you have setup your Messenger user and Bot user, you can add the Bot and cr
 
 ## <a id="running-ws"></a>Running the WebSocket API demo application
 1. Unzip or download the tutorial project folder into a directory of your choice. 
-2. Open a command prompt or console and go to folder *src*.
+2. Open a command prompt or console.
 3. Run ```$>pip install -r ws-requirements.txt``` command in a console to install all the dependencies libraries.
 4. Open the *chatBotAPIPythonWS.py** demo application source code with your editor and input the following parameters
     - ```app_key```: Your AppKey
     - ```bot_username```: Your Bot username
     - ```bot_password```: Your Bot password
     - ```recipient_email``` : Your assoicate Messenger email address (For 1 to 1 message)
-5. Open a command prompt and folder *src* and run the demo application with the following command.
+5. Open a command prompt and go to folder *src*, then run the demo application with the following command.
     ```
-    $>python chatBotAPIPythonWS.py
+    $>python chatbot_demo_ws.py
     ```
 6. The demo will perform authentication process, get an assoicate chatroom, then join that chatroom as same as the REST API demo application [above](#running-rest)
 7. Then demo connects to the Messenger BOT API WebSocket server. Once the application shows WebSocket ```connected``` event in a console, you can start interact with your bot via a chatroom.

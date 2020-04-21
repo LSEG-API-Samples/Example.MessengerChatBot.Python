@@ -27,6 +27,11 @@ class RDPTokenManagement:
     client_secret = ''
     before_timeout = 0
 
+    #new parameters
+
+    access_token = ''
+    refresh_token = ''
+
     # RDP Authentication Service Detail
     rdp_authen_version = '/v1'
     base_URL = 'https://api.refinitiv.com'
@@ -101,7 +106,7 @@ class RDPTokenManagement:
         return response.status_code, response.json()
 
     # Create new RDP Change Password request message and send it to RDP service
-    def change_password(_username, old_password, client_id, new_password):
+    def change_password(self, _username, old_password, client_id, new_password):
 
         # Create request message
         change_password_req_msg = {
@@ -109,7 +114,7 @@ class RDPTokenManagement:
             'username': _username,
             'password': old_password,
             'newPassword': new_password,
-            'scope': scope,
+            'scope': self.scope,
             'takeExclusiveSignOnControl': 'true'
         }
 
@@ -122,10 +127,10 @@ class RDPTokenManagement:
                                      headers={
                                          'Accept': 'application/json',
                                          'Content-Type': 'application/x-www-form-urlencoded'},
-                                     data=authen_request_msg,
+                                     data=change_password_req_msg,
                                      auth=(
-                                         app_key,
-                                         client_secret
+                                         self.app_key,
+                                         self.client_secret
                                      ))
         except requests.exceptions.RequestException as e:
             print('RDP Change Password exception failure:', e)
@@ -163,7 +168,7 @@ class RDPTokenManagement:
     
     """
 
-    def get_token(self, save_token_to_file=True):
+    def get_token(self, save_token_to_file=True, current_refresh_token = None):
         is_request_error = False
         try:
             if save_token_to_file:
@@ -179,8 +184,14 @@ class RDPTokenManagement:
                         print(
                             'Token expired, request a new Token with a refresh token')
 
-            status, auth_obj = self.request_new_token(
-                auth_obj['refresh_token'])
+            #debug
+                status, auth_obj = self.request_new_token(auth_obj['refresh_token'])
+            else:
+                print('else:')
+                status, auth_obj = self.request_new_token(current_refresh_token) #work
+                #simulate old code
+                #status, auth_obj = self.request_new_token(auth_obj['refresh_token'])
+           
         except IOError as e:
             print(e)
             print('None Token found, requesting a new one')
@@ -190,6 +201,7 @@ class RDPTokenManagement:
             print('None Token found, requesting a new one')
             is_request_error = True
         except:
+            print('[DEBUG] Exception')
             print('Getting a new token...')
             is_request_error = True
 
@@ -199,6 +211,10 @@ class RDPTokenManagement:
         if status == 200:  # HTTP Status 'OK'
             if save_token_to_file:
                 self.save_authen_to_file(auth_obj)
+
+            #new code
+            self.access_token = auth_obj['access_token']
+            self.refresh_token = auth_obj['refresh_token']
             return auth_obj
         else:
             return None

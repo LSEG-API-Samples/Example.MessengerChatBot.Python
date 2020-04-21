@@ -32,13 +32,14 @@ recipient_email = '---YOUR MESSENGER ACCOUNT EMAIL---'
 # Setting Log level the supported value is 'logging.WARN' and 'logging.DEBUG'
 log_level = logging.WARN
 
-# Authentication and connection objects
+# Authentication and connection objectscls
 auth_token = None
 rdp_token = None
 access_token = None
 expire_time = 0
 logged_in = False
 
+refresh_token = None
 # Chatroom objects
 chatroom_id = None
 joined_rooms = None
@@ -53,10 +54,11 @@ bot_api_base_path = '/messenger/beta1'
 
 def authen_rdp(rdp_token_object):  # Call RDPTokenManagement to get authentication
     # Based on WebSocket application behavior, the Authentication will not read/write Token from rest-token.txt file
-    auth_token = rdp_token_object.get_token(save_token_to_file=False)
+    print('chatbot_demo_ws.py: refresh_token = %s' % (refresh_token))
+    auth_token = rdp_token_object.get_token(save_token_to_file=False,  current_refresh_token = refresh_token)
     if auth_token:
-        # return RDP access token (sts_token) , expire_in values and RDP login status
-        return auth_token['access_token'], auth_token['expires_in'], True
+        # return RDP access token (sts_token) ,refresh_token , expire_in values and RDP login status
+        return auth_token['access_token'], auth_token['refresh_token'], auth_token['expires_in'] , True
     else:
         return None, 0, False
 
@@ -330,7 +332,7 @@ if __name__ == '__main__':
     rdp_token = RDPTokenManagement(bot_username, bot_password, app_key, 30)
 
     # Authenticate with RDP Token service
-    access_token, expire_time, logged_in = authen_rdp(rdp_token)
+    access_token, refresh_token, expire_time, logged_in = authen_rdp(rdp_token)
     # if not auth_token:
     if not access_token:
         sys.exit(1)
@@ -384,7 +386,7 @@ if __name__ == '__main__':
                 sys.exit(1)
 
             print('Refresh Token ')
-            access_token, expire_time, logged_in = authen_rdp(rdp_token)
+            access_token, refresh_token, expire_time, logged_in = authen_rdp(rdp_token)
             if not access_token:
                 sys.exit(1)
             # Update authentication token to the WebSocket connection.

@@ -29,8 +29,8 @@ bot_password = '---YOUR BOT PASSWORD---'
 app_key = '---YOUR MESSENGER ACCOUNT APPKEY---'
 # Input your Messenger Application account email
 recipient_email = '---YOUR MESSENGER ACCOUNT EMAIL---'
-# Setting Log level the supported value is 'logging.WARN' and 'logging.DEBUG'
-log_level = logging.WARN
+# Setting Log level the supported value is 'logging.INFO' and 'logging.DEBUG'
+log_level = logging.DEBUG
 
 # Authentication and connection objectscls
 auth_token = None
@@ -54,13 +54,12 @@ bot_api_base_path = '/messenger/beta1'
 
 def authen_rdp(rdp_token_object):  # Call RDPTokenManagement to get authentication
     # Based on WebSocket application behavior, the Authentication will not read/write Token from rest-token.txt file
-    print('chatbot_demo_ws.py: refresh_token = %s' % (refresh_token))
     auth_token = rdp_token_object.get_token(save_token_to_file=False,  current_refresh_token = refresh_token)
     if auth_token:
         # return RDP access token (sts_token) ,refresh_token , expire_in values and RDP login status
         return auth_token['access_token'], auth_token['refresh_token'], auth_token['expires_in'] , True
     else:
-        return None, 0, False
+        return None,None, 0, False
 
 
 # Get List of Chatrooms Function via HTTP REST
@@ -77,16 +76,17 @@ def list_chatrooms(access_token, room_is_managed=False):
         response = requests.get(
             url, headers={'Authorization': 'Bearer {}'.format(access_token)})
     except requests.exceptions.RequestException as e:
-        print('Messenger BOT API: List Chatroom exception failure:', e)
+        logging.error('Messenger BOT API: List Chatroom exception failure: %s' % e)
 
     if response.status_code == 200:  # HTTP Status 'OK'
         print('Messenger BOT API: get chatroom  success')
+        logging.info('Receive: %s' % (json.dumps(response.json(),sort_keys=True, indent=2, separators=(',', ':'))))
+        return response.status_code, response.json()
     else:
-        print('Messenger BOT API: get chatroom result failure:',
-              response.status_code, response.reason)
+        print('Messenger BOT API: get chatroom result failure:',response.status_code, response.reason)
         print('Text:', response.text)
-
-    return response.status_code, response.json()
+        return response.status_code, None
+    
 
 
 def join_chatroom(access_token, room_id=None, room_is_managed=False):  # Join chatroom
@@ -104,14 +104,12 @@ def join_chatroom(access_token, room_id=None, room_is_managed=False):  # Join ch
         response = requests.post(
             url, headers={'Authorization': 'Bearer {}'.format(access_token)})
     except requests.exceptions.RequestException as e:
-        print('Messenger BOT API: join chatroom exception failure:', e)
+        logging.error('Messenger BOT API: join chatroom exception failure: %s' % e)
 
     if response.status_code == 200:  # HTTP Status 'OK'
         joined_rooms.append(room_id)
         print('Messenger BOT API: join chatroom success')
-        # Print for debugging purpose
-        logging.debug('Receive: %s' % (json.dumps(response.json(),
-                                                  sort_keys=True, indent=2, separators=(',', ':'))))
+        logging.info('Receive: %s' % (json.dumps(response.json(),sort_keys=True, indent=2, separators=(',', ':'))))
     else:
         print('Messenger BOT API: join chatroom result failure:',
               response.status_code, response.reason)
@@ -130,22 +128,19 @@ def post_direct_message(access_token, contact_email='', text=''):
     }
 
     # Print for debugging purpose
-    logging.debug('Sent: %s' % (json.dumps(
-        body, sort_keys=True, indent=2, separators=(',', ':'))))
+    logging.info('Sent: %s' % (json.dumps(body, sort_keys=True, indent=2, separators=(',', ':'))))
 
     try:
         # Send a HTTP request message with Python requests module
         response = requests.post(
             url=url, data=json.dumps(body), headers={'Authorization': 'Bearer {}'.format(access_token)})
     except requests.exceptions.RequestException as e:
-        print('Messenger BOT API: post a 1 to 1 message exception failure:', e)
+        logging.error('Messenger BOT API: post a 1 to 1 message exception failure: %s ' % e)
 
     if response.status_code == 200:  # HTTP Status 'OK'
         print('Messenger BOT API: post a 1 to 1 message to %s success' %
               (contact_email))
-        # Print for debugging purpose
-        logging.debug('Receive: %s' % (json.dumps(response.json(),
-                                                  sort_keys=True, indent=2, separators=(',', ':'))))
+        logging.info('Receive: %s' % (json.dumps(response.json(),sort_keys=True, indent=2, separators=(',', ':'))))
     else:
         print('Messenger BOT API: post a 1 to 1 message failure:',
               response.status_code, response.reason)
@@ -170,7 +165,7 @@ def post_message_to_chatroom(access_token,  joined_rooms, room_id=None,  text=''
         }
 
         # Print for debugging purpose
-        logging.debug('Sent: %s' % (json.dumps(
+        logging.info('Sent: %s' % (json.dumps(
             body, sort_keys=True, indent=2, separators=(',', ':'))))
 
         response = None
@@ -179,13 +174,13 @@ def post_message_to_chatroom(access_token,  joined_rooms, room_id=None,  text=''
             response = requests.post(
                 url=url, data=json.dumps(body), headers={'Authorization': 'Bearer {}'.format(access_token)})
         except requests.exceptions.RequestException as e:
-            print('Messenger BOT API: post message to exception failure:', e)
+            logging.error('Messenger BOT API: post message to exception failure: %s ' % e)
 
         if response.status_code == 200:  # HTTP Status 'OK'
             joined_rooms.append(room_id)
             print('Messenger BOT API: post message to chatroom success')
             # Print for debugging purpose
-            logging.debug('Receive: %s' % (json.dumps(
+            logging.info('Receive: %s' % (json.dumps(
                 response.json(), sort_keys=True, indent=2, separators=(',', ':'))))
         else:
             print('Messenger BOT API: post message to failure:',
@@ -211,13 +206,11 @@ def leave_chatroom(access_token, joined_rooms, room_id=None, room_is_managed=Fal
             response = requests.post(
                 url, headers={'Authorization': 'Bearer {}'.format(access_token)})
         except requests.exceptions.RequestException as e:
-            print('Messenger BOT API: leave chatroom exception failure:', e)
+            logging.error('Messenger BOT API: leave chatroom exception failure: %s' % e)
 
         if response.status_code == 200:  # HTTP Status 'OK'
             print('Messenger BOT API: leave chatroom success')
-            # Print for debugging purpose
-            logging.debug('Receive: %s' % (json.dumps(
-                response.json(), sort_keys=True, indent=2, separators=(',', ':'))))
+            logging.info('Receive: %s' % (json.dumps(response.json(), sort_keys=True, indent=2, separators=(',', ':'))))
         else:
             print('Messenger BOT API: leave chatroom failure:',
                   response.status_code, response.reason)
@@ -231,24 +224,22 @@ def leave_chatroom(access_token, joined_rooms, room_id=None, room_is_managed=Fal
 
 
 def on_message(_, message):  # Called when message received, parse message into JSON for processing
-    print('Received: ')
     message_json = json.loads(message)
-    print(json.dumps(message_json, sort_keys=True, indent=2, separators=(',', ':')))
+    logging.debug('Received: %s' % (json.dumps(message_json, sort_keys=True, indent=2, separators=(',', ':'))))
     process_message(message_json)
 
 
 def on_error(_, error):  # Called when websocket error has occurred
-    print(error)
+    logging.error('Error: %s' % (error))
 
 
 def on_close(_):  # Called when websocket is closed
-    print('WebSocket Connection Closed')
+    logging.info('WebSocket Connection Closed')
     leave_chatroom(access_token, joined_rooms, chatroom_id)
 
 
 def on_open(_):  # Called when handshake is complete and websocket is open, send login
-    print('WebSocket Connection is established')
-    # Send "connect command to the WebSocket server"
+    logging.info('WebSocket Connection is established')
     send_ws_connect_request(access_token)
 
 
@@ -263,12 +254,13 @@ def send_ws_connect_request(access_token):
             'stsToken': access_token
         }
     }
-    web_socket_app.send(json.dumps(connect_request_msg))
-    print('Sent:')
-    print(json.dumps(
-        connect_request_msg,
-        sort_keys=True,
-        indent=2, separators=(',', ':')))
+    try:
+        web_socket_app.send(json.dumps(connect_request_msg))
+    except Exception as error:
+        #print('send_ws_connect_request Exception:', error)
+        logging.error('send_ws_connect_request exception: %s' % (error))
+
+    logging.info('Sent: %s' % (json.dumps(connect_request_msg, sort_keys=True, indent=2, separators=(',', ':'))))
 
 
 # Function for Refreshing Tokens.  Auth Tokens need to be refreshed within 5 minutes for the WebSocket to persist
@@ -282,12 +274,13 @@ def send_ws_keepalive(access_token):
             'stsToken': access_token
         }
     }
-    web_socket_app.send(json.dumps(connect_request_msg))
-    print('Sent:')
-    print(json.dumps(
-        connect_request_msg,
-        sort_keys=True,
-        indent=2, separators=(',', ':')))
+    try:
+        web_socket_app.send(json.dumps(connect_request_msg))
+    except Exception as error:
+        #print('send_ws_connect_request Exception :', error)
+        logging.error('send_ws_connect_request exception: %s' % (error))
+    
+    logging.info('Sent: %s' % (json.dumps(connect_request_msg, sort_keys=True, indent=2, separators=(',', ':'))))
 
 
 def process_message(message_json):  # Process incoming message from a joined Chatroom
@@ -315,7 +308,7 @@ def process_message(message_json):  # Process incoming message from a joined Cha
                     access_token, joined_rooms, chatroom_id, 'Hello %s\n ' % (sender))
 
         except Exception as error:
-            print('Post meesage to a Chatroom fail :', error)
+            logging.error('Post meesage to a Chatroom fail : %s' % error)
 
 
 # =============================== Main Process ========================================
@@ -323,8 +316,7 @@ def process_message(message_json):  # Process incoming message from a joined Cha
 if __name__ == '__main__':
 
     # Setting Python Logging
-    logging.basicConfig(
-        format='%(levelname)s:%(name)s :%(message)s', level=log_level)
+    logging.basicConfig(format='%(asctime)s: %(levelname)s:%(name)s :%(message)s', level=log_level, datefmt='%Y-%m-%d %H:%M:%S')
 
     print('Getting RDP Authentication Token')
 
@@ -347,6 +339,9 @@ if __name__ == '__main__':
     print('Get Rooms ')
     status, chatroom_respone = list_chatrooms(access_token)
 
+    if not chatroom_respone:
+        sys.exit(1)
+
     #print(json.dumps(chatroom_respone, sort_keys=True,indent=2, separators=(',', ':')))
 
     chatroom_id = chatroom_respone['chatrooms'][0]['chatroomId']
@@ -362,6 +357,7 @@ if __name__ == '__main__':
 
     # Connect to a Chatroom via a WebSocket connection
     print('Connecting to WebSocket %s ... ' % (ws_url))
+    #websocket.enableTrace(True)
     web_socket_app = websocket.WebSocketApp(
         ws_url,
         on_message=on_message,
@@ -379,6 +375,7 @@ if __name__ == '__main__':
     try:
         while True:
             # Give 30 seconds to obtain the new security token and send reissue
+            #logging.debug('expire_time = %s' %(expire_time))
             if int(expire_time) > 30:
                 time.sleep(int(expire_time) - 30)
             else:

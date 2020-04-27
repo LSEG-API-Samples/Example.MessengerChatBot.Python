@@ -23,9 +23,8 @@ bot_password = '---YOUR BOT PASSWORD---'
 app_key = '---YOUR MESSENGER ACCOUNT APPKEY---'
 # Input your Messenger Application account email
 recipient_email = '---YOUR MESSENGER ACCOUNT EMAIL---'
-# Setting Log level the supported value is 'logging.WARN' and 'logging.DEBUG'
-log_level = logging.WARN
-
+# Setting Log level the supported value is 'logging.INFO' and 'logging.DEBUG'
+log_level = logging.DEBUG
 
 # Authentication objects
 auth_token = None
@@ -59,16 +58,17 @@ def list_chatrooms(access_token, room_is_managed=False):
         response = requests.get(
             url, headers={'Authorization': 'Bearer {}'.format(access_token)})
     except requests.exceptions.RequestException as e:
-        print('Messenger BOT API: List Chatroom exception failure:', e)
+        logging.error('Messenger BOT API: List Chatroom exception failure: %s' % e)
 
     if response.status_code == 200:  # HTTP Status 'OK'
         print('Messenger BOT API: get chatroom  success')
+        logging.info('Receive: %s' % (json.dumps(response.json(),sort_keys=True, indent=2, separators=(',', ':'))))
+        return response.status_code, response.json()
     else:
         print('Messenger BOT API: get chatroom result failure:',
               response.status_code, response.reason)
         print('Text:', response.text)
-
-    return response.status_code, response.json()
+        return response.status_code, None
 
 
 def join_chatroom(access_token, room_id=None, room_is_managed=False):  # Join chatroom
@@ -86,13 +86,13 @@ def join_chatroom(access_token, room_id=None, room_is_managed=False):  # Join ch
         response = requests.post(
             url, headers={'Authorization': 'Bearer {}'.format(access_token)})
     except requests.exceptions.RequestException as e:
-        print('Messenger BOT API: join chatroom exception failure:', e)
+        logging.error('Messenger BOT API: join chatroom exception failure: %s' % e)
 
     if response.status_code == 200:  # HTTP Status 'OK'
         joined_rooms.append(room_id)
         print('Messenger BOT API: join chatroom success')
         # Print for debugging purpose
-        logging.debug('Receive: %s' % (json.dumps(response.json(),
+        logging.info('Receive: %s' % (json.dumps(response.json(),
                                                   sort_keys=True, indent=2, separators=(',', ':'))))
     else:
         print('Messenger BOT API: join chatroom result failure:',
@@ -120,13 +120,13 @@ def post_direct_message(access_token, contact_email='', text=''):
         response = requests.post(
             url=url, data=json.dumps(body), headers={'Authorization': 'Bearer {}'.format(access_token)})
     except requests.exceptions.RequestException as e:
-        print('Messenger BOT API: post a 1 to 1 message exception failure:', e)
+        logging.error('Messenger BOT API: post a 1 to 1 message exception failure: %s ' % e)
 
     if response.status_code == 200:  # HTTP Status 'OK'
         print('Messenger BOT API: post a 1 to 1 message to %s success' %
               (contact_email))
         # Print for debugging purpose
-        logging.debug('Receive: %s' % (json.dumps(response.json(),
+        logging.info('Receive: %s' % (json.dumps(response.json(),
                                                   sort_keys=True, indent=2, separators=(',', ':'))))
     else:
         print('Messenger BOT API: post a 1 to 1 message failure:',
@@ -152,7 +152,7 @@ def post_message_to_chatroom(access_token,  joined_rooms, room_id=None,  text=''
         }
 
         # Print for debugging purpose
-        logging.debug('Sent: %s' % (json.dumps(
+        logging.info('Sent: %s' % (json.dumps(
             body, sort_keys=True, indent=2, separators=(',', ':'))))
 
         response = None
@@ -160,13 +160,13 @@ def post_message_to_chatroom(access_token,  joined_rooms, room_id=None,  text=''
             response = requests.post(
                 url=url, data=json.dumps(body), headers={'Authorization': 'Bearer {}'.format(access_token)})  # Send a HTTP request message with Python requests module
         except requests.exceptions.RequestException as e:
-            print('Messenger BOT API: post message exception failure:', e)
+            logging.error('Messenger BOT API: post message to exception failure: %s ' % e)
 
         if response.status_code == 200:  # HTTP Status 'OK'
             joined_rooms.append(room_id)
             print('Messenger BOT API: post message to chatroom success')
             # Print for debugging purpose
-            logging.debug('Receive: %s' % (json.dumps(
+            logging.info('Receive: %s' % (json.dumps(
                 response.json(), sort_keys=True, indent=2, separators=(',', ':'))))
         else:
             print('Messenger BOT API: post message to failure:',
@@ -192,12 +192,11 @@ def leave_chatroom(access_token, joined_rooms, room_id=None, room_is_managed=Fal
             response = requests.post(
                 url, headers={'Authorization': 'Bearer {}'.format(access_token)})
         except requests.exceptions.RequestException as e:
-            print('Messenger BOT API: leave chatroom exception failure:', e)
+            logging.error('Messenger BOT API: leave chatroom exception failure: %s' % e)
 
         if response.status_code == 200:
             print('Messenger BOT API: leave chatroom success')
-            # Print for debugging purpose
-            logging.debug('Receive: %s' % (json.dumps(
+            logging.info('Receive: %s' % (json.dumps(
                 response.json(), sort_keys=True, indent=2, separators=(',', ':'))))
         else:
             print('Messenger BOT API: leave chatroom failure:',
@@ -214,8 +213,7 @@ def leave_chatroom(access_token, joined_rooms, room_id=None, room_is_managed=Fal
 if __name__ == '__main__':
 
     # Setting Python Logging
-    logging.basicConfig(
-        format='%(levelname)s:%(name)s :%(message)s', level=log_level)
+    logging.basicConfig(format='%(asctime)s: %(levelname)s:%(name)s :%(message)s', level=log_level, datefmt='%Y-%m-%d %H:%M:%S')
 
     print('Getting RDP Authentication Token')
 
@@ -242,8 +240,10 @@ if __name__ == '__main__':
     print('Get Rooms ')
     status, chatroom_respone = list_chatrooms(access_token)
 
-    print(json.dumps(chatroom_respone, sort_keys=True,
-                     indent=2, separators=(',', ':')))
+    if not chatroom_respone:
+        sys.exit(1)
+
+    #print(json.dumps(chatroom_respone, sort_keys=True,indent=2, separators=(',', ':')))
 
     chatroom_id = chatroom_respone['chatrooms'][0]['chatroomId']
     # print('Chatroom ID is ', chatroom_id)

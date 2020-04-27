@@ -87,17 +87,15 @@ class RDPTokenManagement:
                                          self.client_secret
                                      ))
         except requests.exceptions.RequestException as e:
-            print('RDP authentication exception failure:', e)
+            logging.error('RDP authentication exception failure: %s' % (e))
 
         if response.status_code == 200:  # HTTP Status 'OK'
             print('Authenticaion success')
             # Print RDP authentication response message for debugging purpose
-            logging.debug('Receive: %s' % (json.dumps(
-                response.json(), sort_keys=True, indent=2, separators=(',', ':'))))
+            logging.debug('Receive: %s' % (json.dumps(response.json(), sort_keys=True, indent=2, separators=(',', ':'))))
         else:  # Handle HTTP error
-            print('RDP authentication result failure:',
-                  response.status_code, response.reason)
-            print('Text:', response.text)
+            logging.error('RDP authentication result failure: %s %s' % (response.status_code, response.reason))
+            logging.error('Text: %s' % (response.text))
             # both access and refresh tokens are expired
             if response.status_code == 400 and (response.json()['error'] == 'invalid_grant' or response.json()['error_description'] == 'Refresh token does not exist.'):
                 print('Both Access Token and Refresh Token are expired')
@@ -133,7 +131,7 @@ class RDPTokenManagement:
                                          self.client_secret
                                      ))
         except requests.exceptions.RequestException as e:
-            print('RDP Change Password exception failure:', e)
+            logging.error('RDP Change Password exception failure: %s' % (e))
 
         if response.status_code == 200:  # HTTP Status 'OK'
             print('Change Password success')
@@ -142,9 +140,8 @@ class RDPTokenManagement:
                 response.json(), sort_keys=True, indent=2, separators=(',', ':'))))
             self.save_authen_to_file(response.json())
         else:
-            print('RDP Change Password result failure:',
-                  response.status_code, response.reason)
-            print('Text:', response.text)
+            logging.error('RDP Change Password result failure: %s %s' % (response.status_code, response.reason))
+            logging.error('Text: %s' % (response.text))
 
         return response.status_code, response.json()
 
@@ -171,7 +168,7 @@ class RDPTokenManagement:
     def get_token(self, save_token_to_file=True, current_refresh_token = None):
         is_request_error = False
         try:
-            if save_token_to_file:
+            if save_token_to_file: # chatbot_demo_rest.js
                 print('Checking RDP token information in %s' %
                       (self.token_file))
                 with open(self.token_file, 'r+') as saved_token:  # Open './token.txt' file
@@ -186,22 +183,19 @@ class RDPTokenManagement:
 
             #debug
                 status, auth_obj = self.request_new_token(auth_obj['refresh_token'])
-            else:
-                print('else:')
+            else: # chatbot_demo_ws.js
                 status, auth_obj = self.request_new_token(current_refresh_token) #work
-                #simulate old code
                 #status, auth_obj = self.request_new_token(auth_obj['refresh_token'])
            
         except IOError as e:
-            print(e)
+            logging.error('IOError Exception: %s' % e)
             print('None Token found, requesting a new one')
             is_request_error = True
         except json.JSONDecodeError as json_error:
-            print(json_error)
+            logging.error('json.JSONDecodeError Exception: %s' % json_error)
             print('None Token found, requesting a new one')
             is_request_error = True
         except:
-            print('[DEBUG] Exception')
             print('Getting a new token...')
             is_request_error = True
 
@@ -223,8 +217,7 @@ class RDPTokenManagement:
 # =============================== Main Process, For verifying your RDP Account purpose ============================
 if __name__ == '__main__':
 
-    logging.basicConfig(
-        format='%(levelname)s:%(name)s :%(message)s', level=logging.DEBUG)
+    logging.basicConfig(format='%(asctime)s: %(levelname)s:%(name)s :%(message)s', level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
 
     print('Getting RDP Authentication Token')
 
@@ -232,6 +225,7 @@ if __name__ == '__main__':
     _username = '---YOUR RDP USERNAME---'
     _password = '---YOUR PASSWORD---'
     _app_key = '---YOUR GENERATED CLIENT ID---'
+
 
     """
     Input above RDP credentials information and run this module with the following command in a console

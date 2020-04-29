@@ -1,5 +1,5 @@
 # Messenger Bot API Demo Applications with Python
-- version: 1.0.1 C1
+- version: 1.0.1 C1 (Control Load 1.0)
 - Last update: April 2020
 - Environment: Windows
 - Compiler: Python

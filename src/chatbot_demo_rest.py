@@ -41,7 +41,10 @@ bot_api_base_path = '/messenger/beta1'
 def authen_rdp(rdp_token_object):  # Call RDPTokenManagement to get authentication
     # Based on REST application behavior, the Authentication will read/write Token from rest-token.txt file
     auth_token = rdp_token_object.get_token()
-    return auth_token['access_token']  # return RDP access token (sts_token)
+    if auth_token:
+        return auth_token['access_token']  # return RDP access token (sts_token)
+    else:
+        return None
 
 
 # Get List of Chatrooms Function via HTTP REST

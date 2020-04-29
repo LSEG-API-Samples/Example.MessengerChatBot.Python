@@ -52,7 +52,10 @@ class RDPTokenManagement:
         self.before_timeout = before_timeout
 
     # Create new RDP Authentication request message and send it to RDP service
-    def request_new_token(self, refresh_token):
+    def request_new_token(self, refresh_token, url=None):
+
+        if url is None:
+            url = self.authen_URL
 
         # Create a request message
         if not refresh_token:
@@ -77,7 +80,7 @@ class RDPTokenManagement:
             authen_request_msg, sort_keys=True, indent=2, separators=(',', ':'))))
         try:
             # Send request message to RDP with Python requests module
-            response = requests.post(self.authen_URL,
+            response = requests.post(url,
                                      headers={
                                          'Accept': 'application/json',
                                          'Content-Type': 'application/x-www-form-urlencoded'},
@@ -97,10 +100,25 @@ class RDPTokenManagement:
             logging.error('RDP authentication result failure: %s %s' % (response.status_code, response.reason))
             logging.error('Text: %s' % (response.text))
             # both access and refresh tokens are expired
-            if response.status_code == 400 and (response.json()['error'] == 'invalid_grant' or response.json()['error_description'] == 'Refresh token does not exist.'):
-                print('Both Access Token and Refresh Token are expired')
-                raise Exception('Both Access Token and Refresh Token are expired {0} - {1}'
-                                .format(response.status_code, response.text))
+            #if response.status_code == 400 and (response.json()['error'] == 'invalid_grant' or response.json()['error_description'] == 'Refresh token does not exist.'):
+            #    print('Both Access Token and Refresh Token are expired')
+            #    raise Exception('Both Access Token and Refresh Token are expired {0} - {1}'.format(response.status_code, response.text))
+            if response.status_code == 400 or response.status_code == 401:
+                if refresh_token:
+                    print('Retry with username and password')
+                    return self.request_new_token(None)
+                return None, None
+            elif response.status_code == 403 or response.status_code == 451:
+                print('Stop retrying with the request')
+                return None, None
+            elif response.status_code == 301 or response.status_code == 302 or response.status_code == 307 or response.status_code == 308:
+                # Perform URL redirect
+                new_host = response.headers['Location']
+                if new_host is not None:
+                    print('Perform URL redirect to ', new_host)
+                    return self.request_new_token(refresh_token, new_host)
+                return None, None, None
+
         return response.status_code, response.json()
 
     # Create new RDP Change Password request message and send it to RDP service
@@ -178,14 +196,12 @@ class RDPTokenManagement:
                         return auth_obj
                     else:
                         # Access Token expire
-                        print(
-                            'Token expired, request a new Token with a refresh token')
-
-            #debug
+                        print('Token expired, request a new Token with a refresh token')
+                        
+                # chatbot_demo_rest.js
                 status, auth_obj = self.request_new_token(auth_obj['refresh_token'])
             else: # chatbot_demo_ws.js
-                status, auth_obj = self.request_new_token(current_refresh_token) #work
-                #status, auth_obj = self.request_new_token(auth_obj['refresh_token'])
+                status, auth_obj = self.request_new_token(current_refresh_token) 
            
         except IOError as e:
             logging.error('IOError Exception: %s' % e)
@@ -222,9 +238,9 @@ if __name__ == '__main__':
     print('Getting RDP Authentication Token')
 
     # Authentication Variables
-    _username = '---YOUR RDP USERNAME---'
-    _password = '---YOUR PASSWORD---'
-    _app_key = '---YOUR GENERATED CLIENT ID---'
+    _username = '---YOUR BOT USERNAME---'
+    _password = '---YOUR BOT PASSWORD---'
+    _app_key = '---YOUR MESSENGER ACCOUNT APPKEY---'
 
 
     """
@@ -233,7 +249,7 @@ if __name__ == '__main__':
     """
 
     rdp_token = RDPTokenManagement(
-        _username, _password, _app_key, logging.WARN)
+        _username, _password, _app_key, logging.DEBUG)
     auth_obj = rdp_token.get_token()
     # auth_obj = rdp_token.get_token(save_token_to_file=False)
     if auth_obj:

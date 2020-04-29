@@ -374,10 +374,10 @@ if __name__ == '__main__':
 
     try:
         while True:
-            # Give 30 seconds to obtain the new security token and send reissue
+            # Give 60 seconds to obtain the new security token and send reissue
             #logging.debug('expire_time = %s' %(expire_time))
-            if int(expire_time) > 30:
-                time.sleep(int(expire_time) - 30)
+            if int(expire_time) > 60: 
+                time.sleep(int(expire_time) - 60) 
             else:
                 # Fail the refresh since value too small
                 sys.exit(1)

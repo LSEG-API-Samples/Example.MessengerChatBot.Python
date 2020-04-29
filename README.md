@@ -1,6 +1,6 @@
 # Messenger Bot API Demo Applications with Python
-- version: 1.0.1
-- Last update: January 2020
+- version: 1.0.1 C1
+- Last update: April 2020
 - Environment: Windows
 - Compiler: Python
 - Prerequisite: [Access to Messenger application](#prerequisite)
@@ -152,11 +152,6 @@ Once you have setup your Messenger user and Bot user, you can add the Bot and cr
 9. The Messenger application supports tabular data, hyperlinks and a full set of emoji in the message. You can type ```/complex_message``` message into a Chatroom to see an example.
     ![Figure-7](images/eikon_msg_complex_msg.png "Complex message") 
 
-## <a id="running-debug"></a>Running demo applications with debug log
-You can enable the REST and WebSocket application debug log level via ```log_level = logging.WARN``` application source code statement.The supported values are *logging.WARN* and *logging.DEBUG* levels.
-
-The *logging.DEBUG* level shows incoming and outgoing messages between the demo applications and Messenger BOT API REST and WebSocket servers.
-
 ## <a id="author"></a>Authors
 - Wasin Waeosri (wasin.waeosri@refinitiv.com)
 - Dino Diviacchi (dino.diviacchi@refinitiv.com)
@@ -167,3 +162,4 @@ For further details, please check out the following resources:
 * [Refinitiv Messenger Bot API: Quick Start](https://developers.refinitiv.com/messenger-api/messenger-bot-api/quick-start). 
 * [Refinitiv Messenger Bot API: Documentation page](https://developers.refinitiv.com/messenger-api/messenger-bot-api/docs).
 * [Refinitiv Messenger Bot API Demo application - JavaScript](https://github.com/Refinitiv-API-Samples/Tutorial.MessengerChatBot.JavaScript)
+* [Refinitiv Data Platform APIs page](https://developers.refinitiv.com/refinitiv-data-platform/refinitiv-data-platform-apis).

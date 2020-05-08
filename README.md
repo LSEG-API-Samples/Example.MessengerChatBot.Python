@@ -1,6 +1,6 @@
 # Messenger Bot API Demo Applications with Python
-- version: 1.0.1 C1 (Control Load 1.0)
-- Last update: April 2020
+- version: 1.0.2
+- Last update: May 2020
 - Environment: Windows
 - Compiler: Python
 - Prerequisite: [Access to Messenger application](#prerequisite)
@@ -28,6 +28,7 @@ This demo project shows how to implement the Messenger BOT API console applicati
 - *chatbot_demo_rest.py*: A REST API example that sends chat message to individual and a Chatroom. 
 - *chatbot_demo_ws.py*: A REST and WebSocket APIs example that sends and receives chat message with a Chatroom. 
 - *rdp_token.py*: A Python module that manages RDP Authentication process for chatbot_demo_rest.py and chatbot_demo_ws.py applications. This module is based on [RDP Python Quickstart Python source code](https://developers.refinitiv.com/refinitiv-data-platform/refinitiv-data-platform-apis/downloads) implemented by Gurpreet Bal.
+- *rdp_change_password_demo.py*: A Python script for changing RDP Account Password via RDP Auth Service API. This script is based on [RDP Python Quickstart Python source code](https://developers.refinitiv.com/refinitiv-data-platform/refinitiv-data-platform-apis/downloads) implemented by Gurpreet Bal.
 
 Note: Please note that the main concept for using Messager Bot REST and WebSocket APIs are the same for all technologies (see [JavaScript example](https://github.com/Refinitiv-API-Samples/Tutorial.MessengerChatBot.JavaScript)). 
 

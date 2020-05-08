@@ -121,47 +121,6 @@ class RDPTokenManagement:
 
         return response.status_code, response.json()
 
-    # Create new RDP Change Password request message and send it to RDP service
-    def change_password(self, _username, old_password, client_id, new_password):
-
-        # Create request message
-        change_password_req_msg = {
-            'grant_type': 'password',
-            'username': _username,
-            'password': old_password,
-            'newPassword': new_password,
-            'scope': self.scope,
-            'takeExclusiveSignOnControl': 'true'
-        }
-
-        # Print for debugging purpose
-        logging.debug('Sent: %s' % (json.dumps(
-            change_password_req_msg, sort_keys=True, indent=2, separators=(',', ':'))))
-
-        try:
-            response = requests.post(self.authen_URL,
-                                     headers={
-                                         'Accept': 'application/json',
-                                         'Content-Type': 'application/x-www-form-urlencoded'},
-                                     data=change_password_req_msg,
-                                     auth=(
-                                         self.app_key,
-                                         self.client_secret
-                                     ))
-        except requests.exceptions.RequestException as e:
-            logging.error('RDP Change Password exception failure: %s' % (e))
-
-        if response.status_code == 200:  # HTTP Status 'OK'
-            print('Change Password success')
-            # Print RDP Change Password response message for debugging purpose
-            logging.debug('Receive: %s' % (json.dumps(
-                response.json(), sort_keys=True, indent=2, separators=(',', ':'))))
-            self.save_authen_to_file(response.json())
-        else:
-            logging.error('RDP Change Password result failure: %s %s' % (response.status_code, response.reason))
-            logging.error('Text: %s' % (response.text))
-
-        return response.status_code, response.json()
 
     # Save RDP Authentication information (Access Token, Refresh Token and Expire time) into the file
     def save_authen_to_file(self, _authen_obj):
@@ -245,7 +204,7 @@ if __name__ == '__main__':
 
     """
     Input above RDP credentials information and run this module with the following command in a console
-    $>python rdpToken.py
+    $>python rdp_token.py
     """
 
     rdp_token = RDPTokenManagement(

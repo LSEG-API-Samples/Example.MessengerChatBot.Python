@@ -234,12 +234,14 @@ def on_error(_, error):  # Called when websocket error has occurred
 
 
 def on_close(_):  # Called when websocket is closed
-    logging.info('WebSocket Connection Closed')
+    logging.error('Receive: onclose event. WebSocket Connection Closed')
     leave_chatroom(access_token, joined_rooms, chatroom_id)
+    # Abort application
+    sys.exit("Abort application")
 
 
 def on_open(_):  # Called when handshake is complete and websocket is open, send login
-    logging.info('WebSocket Connection is established')
+    logging.info('Receive: onopen event. WebSocket Connection is established')
     send_ws_connect_request(access_token)
 
 
@@ -327,6 +329,7 @@ if __name__ == '__main__':
     access_token, refresh_token, expire_time, logged_in = authen_rdp(rdp_token)
     # if not auth_token:
     if not access_token:
+        # Abort application
         sys.exit(1)
 
     print('Successfully Authenticated ')
@@ -340,6 +343,7 @@ if __name__ == '__main__':
     status, chatroom_respone = list_chatrooms(access_token)
 
     if not chatroom_respone:
+        # Abort application
         sys.exit(1)
 
     #print(json.dumps(chatroom_respone, sort_keys=True,indent=2, separators=(',', ':')))
@@ -353,6 +357,7 @@ if __name__ == '__main__':
     # print('joined_rooms is ', joined_rooms)
 
     if not joined_rooms:
+        # Abort application
         sys.exit(1)
 
     # Connect to a Chatroom via a WebSocket connection
@@ -380,11 +385,13 @@ if __name__ == '__main__':
                 time.sleep(int(expire_time) - 60) 
             else:
                 # Fail the refresh since value too small
+                # Abort application
                 sys.exit(1)
 
             print('Refresh Token ')
             access_token, refresh_token, expire_time, logged_in = authen_rdp(rdp_token)
             if not access_token:
+                # Abort application
                 sys.exit(1)
             # Update authentication token to the WebSocket connection.
             if logged_in:

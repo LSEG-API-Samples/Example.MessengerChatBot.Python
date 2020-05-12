@@ -24,7 +24,7 @@ The [Messenger Bot API](https://developers.refinitiv.com/messenger-api) provides
 
 ## <a id="overview"></a>Messenger Bot API Demo overview
 
-This demo project shows how to implement the Messenger BOT API console applications with the REST and WebSocket APIs in [Python](https://www.python.org/) programming language. The applications makes an authentication with [RDP](https://developers.refinitiv.com/refinitiv-data-platform/refinitiv-data-platform-apis) Authentication service, then lets developers interact with Messeger Application/Chatroom on behalf of Bot via the REST and WebSocket APIs. 
+This demo project shows how to implement the basic Messenger BOT API console application workflows with the REST and WebSocket APIs in [Python](https://www.python.org/) programming language. The applications makes an authentication with [RDP](https://developers.refinitiv.com/refinitiv-data-platform/refinitiv-data-platform-apis) Auth service, then lets developers interact with Messeger Application/Chatroom on behalf of Bot via the REST and WebSocket APIs. 
 - *chatbot_demo_rest.py*: A REST API example that sends chat message to individual and a Chatroom. 
 - *chatbot_demo_ws.py*: A REST and WebSocket APIs example that sends and receives chat message with a Chatroom. 
 - *rdp_token.py*: A Python module that manages RDP Authentication process for chatbot_demo_rest.py and chatbot_demo_ws.py applications. This module is based on [RDP Python Quickstart Python source code](https://developers.refinitiv.com/refinitiv-data-platform/refinitiv-data-platform-apis/downloads) implemented by Gurpreet Bal.
@@ -43,7 +43,7 @@ This tutorial source code requires the following dependencies.
 Please contact your Refinitiv's representative and Dino Diviacchi (dino.diviacchi@refinitiv.com) to help you to access Messenger application and Bot API. The Refinitiv team will then provision and set up the bot. Once this is done the email user you provided will receive an automated email with how to set up a password for the bot.
 
 *Note:* 
-- The Python example has been qualified with Python versions 3.6.5
+- The Python example has been qualified with Python versions 3.6.5 and 3.7.7
 - Please refer to the [pip installation guide page](https://pip.pypa.io/en/stable/installing/) if your environment does not have the [pip tool](https://pypi.org/project/pip/) installed. 
 - If your environment already have a websocket-client library installed, you can use ```pip list``` command to verify a library version, then use ```pip install --upgrade websocket-client``` command to upgrade websocket-client library. 
 

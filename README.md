@@ -164,3 +164,5 @@ For further details, please check out the following resources:
 * [Refinitiv Messenger Bot API: Documentation page](https://developers.refinitiv.com/messenger-api/messenger-bot-api/docs).
 * [Refinitiv Messenger Bot API Demo application - JavaScript](https://github.com/Refinitiv-API-Samples/Tutorial.MessengerChatBot.JavaScript)
 * [Refinitiv Data Platform APIs page](https://developers.refinitiv.com/refinitiv-data-platform/refinitiv-data-platform-apis).
+
+For any question related to the Messenger Bot API, please use the Developers Community [Q&A Forum](https://community.developers.refinitiv.com/spaces/303/index.html).

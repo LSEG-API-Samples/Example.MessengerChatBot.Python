@@ -1,9 +1,12 @@
 # Messenger Bot API Demo Applications with Python
-- version: 1.0.2
-- Last update: September 2021
+- version: 1.0.3
+- Last update: Mar 2022
 - Environment: Windows
 - Compiler: Python
 - Prerequisite: [Access to Messenger application](#prerequisite)
+
+Example Code Disclaimer:
+ALL EXAMPLE CODE IS PROVIDED ON AN “AS IS” AND “AS AVAILABLE” BASIS FOR ILLUSTRATIVE PURPOSES ONLY. REFINITIV MAKES NO REPRESENTATIONS OR WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, AS TO THE OPERATION OF THE EXAMPLE CODE, OR THE INFORMATION, CONTENT, OR MATERIALS USED IN CONNECTION WITH THE EXAMPLE CODE. YOU EXPRESSLY AGREE THAT YOUR USE OF THE EXAMPLE CODE IS AT YOUR SOLE RISK.
 
 ## Messenger Bot API Introduction
 
@@ -24,13 +27,13 @@ The [Messenger Bot API](https://developers.refinitiv.com/en/api-catalog/messenge
 
 ## <a id="overview"></a>Messenger Bot API Demo overview
 
-This demo project shows how to implement the basic Messenger BOT API console application workflows with the REST and WebSocket APIs in [Python](https://www.python.org/) programming language. The applications makes an authentication with [RDP](https://developers.refinitiv.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis) Auth service, then lets developers interact with Messeger Application/Chatroom on behalf of Bot via the REST and WebSocket APIs. 
+This demo project shows how to implement the basic Messenger BOT API console application workflows with the REST and WebSocket APIs in [Python](https://www.python.org/) programming language. The applications makes an authentication with [RDP](https://developers.refinitiv.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis) Auth service, then lets developers interact with Messenger Application/Chatroom on behalf of Bot via the REST and WebSocket APIs. 
 - *chatbot_demo_rest.py*: A REST API example that sends chat message to individual and a Chatroom. 
 - *chatbot_demo_ws.py*: A REST and WebSocket APIs example that sends and receives chat message with a Chatroom. 
 - *rdp_token.py*: A Python module that manages RDP Authentication process for chatbot_demo_rest.py and chatbot_demo_ws.py applications. This module is based on [RDP Python Quickstart Python source code](https://developers.refinitiv.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis/downloads) implemented by Gurpreet Bal.
 - *rdp_change_password_demo.py*: A Python script for changing RDP Account Password via RDP Auth Service API. This script is based on [RDP Python Quickstart Python source code](https://developers.refinitiv.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis/downloads) implemented by Gurpreet Bal.
 
-Note: Please note that the main concept for using Messager Bot REST and WebSocket APIs are the same for all technologies (see [JavaScript example](https://github.com/Refinitiv-API-Samples/Tutorial.MessengerChatBot.JavaScript)). 
+Note: Please note that the main concept for using Messenger Bot REST and WebSocket APIs are the same for all technologies (see [JavaScript example](https://github.com/Refinitiv-API-Samples/Tutorial.MessengerChatBot.JavaScript)). 
 
 ## <a id="prerequisite"></a>Prerequisite 
 This tutorial source code requires the following dependencies.
@@ -40,7 +43,7 @@ This tutorial source code requires the following dependencies.
 4. Python's [websocket-client](https://pypi.org/project/websocket-client/) library (*version 0.49 or greater*) for the WebSocket connection .
 4. Messenger Bot API access and license.
 
-Please contact your Refinitiv's representative and Dino Diviacchi (dino.diviacchi@refinitiv.com) to help you to access Messenger application and Bot API. The Refinitiv team will then provision and set up the bot. Once this is done the email user you provided will receive an automated email with how to set up a password for the bot.
+Please contact your Refinitiv's representative and Dino Diviacchi (dino.diviacchi@lseg.com) to help you to access Messenger application and Bot API. The Refinitiv team will then provision and set up the bot. Once this is done the email user you provided will receive an automated email with how to set up a password for the bot.
 
 *Note:* 
 - The Python example has been qualified with Python versions 3.6.5 and 3.7.7
@@ -92,12 +95,12 @@ Once you have setup your Messenger user and Bot user, you can add the Bot and cr
     - ```app_key```: Your AppKey
     - ```bot_username```: Your Bot username
     - ```bot_password```: Your Bot password
-    - ```recipient_email``` : Your assoicate Messenger email address 
+    - ```recipient_email``` : Your associate Messenger email address 
 5. OOpen a command prompt and go to folder *src*, then run the demo application with the following command.
     ```
     $>python chatbot_demo_rest.py
     ```
-6. The application then authenticates with [RDP](https://developers.refinitiv.com/refinitiv-data-platform) Authentication service and sends a 1-1 message to your assoicate Eikon message email address. 
+6. The application then authenticates with [RDP](https://developers.refinitiv.com/refinitiv-data-platform) Authentication service and sends a 1-1 message to your associate Eikon message email address. 
     ```
     Getting RDP Authentication Token
 
@@ -136,7 +139,7 @@ Once you have setup your Messenger user and Bot user, you can add the Bot and cr
     ```
     $>python chatbot_demo_ws.py
     ```
-6. The demo will perform authentication process, get an assoicate chatroom, then join that chatroom as same as the REST API demo application [above](#running-rest)
+6. The demo will perform authentication process, get an associate chatroom, then join that chatroom as same as the REST API demo application [above](#running-rest)
 7. Then demo connects to the Messenger BOT API WebSocket server. Once the application shows WebSocket ```connected``` event in a console, you can start interact with your bot via a chatroom.
     ```
     Messenger BOT API: join chatroom success
@@ -154,8 +157,8 @@ Once you have setup your Messenger user and Bot user, you can add the Bot and cr
     ![Figure-7](images/eikon_msg_complex_msg.png "Complex message") 
 
 ## <a id="author"></a>Authors
-- Wasin Waeosri (wasin.waeosri@refinitiv.com)
-- Dino Diviacchi (dino.diviacchi@refinitiv.com)
+- Refinitiv Developer Advocate (https://developers.refinitiv.com/en)
+- Dino Diviacchi (dino.diviacchi@lseg.com)
 
 ## <a id="references"></a>References
 For further details, please check out the following resources:

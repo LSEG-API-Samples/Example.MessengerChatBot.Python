@@ -382,6 +382,8 @@ if __name__ == '__main__':
             # Give 60 seconds to obtain the new security token and send reissue
             #logging.debug('expire_time = %s' %(expire_time))
             if int(expire_time) > 60: 
+                #The current RDP expires_time is 600 seconds (10 minutes). However, the Messenger Bot WebSocket server still uses 300 seconds (5 minutes).
+                expire_time = '300'
                 time.sleep(int(expire_time) - 60) 
             else:
                 # Fail the refresh since value too small

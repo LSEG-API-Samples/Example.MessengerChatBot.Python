@@ -233,7 +233,7 @@ def on_error(_, error):  # Called when websocket error has occurred
     logging.error('Error: %s' % (error))
 
 
-def on_close(_):  # Called when websocket is closed
+def on_close(_, close_status_code, close_msg):  # Called when websocket is closed
     logging.error('Receive: onclose event. WebSocket Connection Closed')
     leave_chatroom(access_token, joined_rooms, chatroom_id)
     # Abort application

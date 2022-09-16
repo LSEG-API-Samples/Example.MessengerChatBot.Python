@@ -1,6 +1,6 @@
 # Messenger Bot API Demo Applications with Python
-- version: 1.0.3
-- Last update: Jun 2022
+- version: 1.0.4
+- Last update: Sep 2022
 - Environment: Windows
 - Compiler: Python
 - Prerequisite: [Access to Messenger application](#prerequisite)
@@ -49,7 +49,7 @@ This tutorial source code requires the following dependencies.
 Please contact your Refinitiv's representative and Dino Diviacchi (dino.diviacchi@lseg.com) to help you to access Messenger application and Bot API. The Refinitiv team will then provision and set up the bot. Once this is done the email user you provided will receive an automated email with how to set up a password for the bot.
 
 *Note:* 
-- The Python example has been qualified with Python versions 3.6.5 and 3.7.7
+- The Python example has been qualified with Python versions 3.9
 - Please refer to the [pip installation guide page](https://pip.pypa.io/en/stable/installing/) if your environment does not have the [pip tool](https://pypi.org/project/pip/) installed. 
 - If your environment already have a websocket-client library installed, you can use ```pip list``` command to verify a library version, then use ```pip install --upgrade websocket-client``` command to upgrade websocket-client library. 
 

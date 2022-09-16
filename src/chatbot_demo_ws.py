@@ -165,8 +165,7 @@ def post_message_to_chatroom(access_token,  joined_rooms, room_id=None,  text=''
         }
 
         # Print for debugging purpose
-        logging.info('Sent: %s' % (json.dumps(
-            body, sort_keys=True, indent=2, separators=(',', ':'))))
+        logging.info('Sent: %s' % (json.dumps(body, sort_keys=True, indent=2, separators=(',', ':'))))
 
         response = None
         try:
@@ -243,6 +242,14 @@ def on_close(_, close_status_code, close_msg):  # Called when websocket is close
 def on_open(_):  # Called when handshake is complete and websocket is open, send login
     logging.info('Receive: onopen event. WebSocket Connection is established')
     send_ws_connect_request(access_token)
+
+# For the environment that needs a ping-pong message only
+def on_ping(_, message):
+    print("Got a ping! A pong reply has already been automatically sent.")
+
+# For the environment that needs a ping-pong message only
+def on_pong(_, message):
+    print("Got a pong! No need to respond")
 
 
 # Send a connection request to Messenger ChatBot API WebSocket server
@@ -368,13 +375,25 @@ if __name__ == '__main__':
         on_message=on_message,
         on_error=on_error,
         on_close=on_close,
+        on_open=on_open,
         subprotocols=['messenger-json'])
-
-    web_socket_app.on_open = on_open
     # Event loop
     wst = threading.Thread(
         target=web_socket_app.run_forever,
         kwargs={'sslopt': {'check_hostname': False}})
+    
+    # # For the environment that needs a ping-pong message only
+    # web_socket_app = websocket.WebSocketApp(ws_url,
+    #     on_message=on_message,
+    #     on_error=on_error,
+    #     on_close=on_close,
+    #     on_open=on_open,
+    #     on_ping=on_ping,
+    #     on_pong=on_pong,
+    #     subprotocols=['messenger-json'])
+    # # Event loop
+    # wst = threading.Thread(target=web_socket_app.run_forever, kwargs={"sslopt": {"check_hostname": False}, "ping_interval": 60, "ping_timeout": 10, "ping_payload": "2"})
+
     wst.start()
 
     try:

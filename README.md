@@ -159,6 +159,43 @@ Once you have setup your Messenger user and Bot user, you can add the Bot and cr
 9. The Messenger application supports tabular data, hyperlinks and a full set of emoji in the message. You can type ```/complex_message``` message into a Chatroom to see an example.
     ![Figure-7](images/eikon_msg_complex_msg.png "Complex message") 
 
+## Ping-Pong Message
+
+Some network environments might have a policy/rule that needs some kind of heartbeat messages or activities every certain minutes to keep a WebSocket connection active. If you are encountering a WebSocket disconnection issue every 1 to 3 minutes, please try the following code statements in the main part of a ```chatbot_demo_ws.py``` file.
+
+```
+ # Connect to a Chatroom via a WebSocket connection
+print('Connecting to WebSocket %s ... ' % (ws_url))
+#websocket.enableTrace(True)
+# web_socket_app = websocket.WebSocketApp(
+#     ws_url,
+#     on_message=on_message,
+#     on_error=on_error,
+#     on_close=on_close,
+#     on_open=on_open,
+#     subprotocols=['messenger-json'])
+# # Event loop
+# wst = threading.Thread(
+#     target=web_socket_app.run_forever,
+#     kwargs={'sslopt': {'check_hostname': False}})
+    
+## For the environment that needs a ping-pong message only
+web_socket_app = websocket.WebSocketApp(ws_url,
+    on_message=on_message,
+    on_error=on_error,
+    on_close=on_close,
+    on_open=on_open,
+    on_ping=on_ping,
+    on_pong=on_pong,
+    subprotocols=['messenger-json'])
+# Event loop
+wst = threading.Thread(target=web_socket_app.run_forever, kwargs={"sslopt": {"check_hostname": False}, "ping_interval": 60, "ping_timeout": 10, "ping_payload": "2"})
+```
+
+If the problem is persisting, please check your network firewall or proxy.
+
+**Note**: Please note that all Messenger Bot API connections (HTTP and WebSocket) are going through the internet which is an uncontrolled environment, so there might be some network disconnection over a period of time. The example application aims for demonstrating the API workflow only. The code does not cover all use cases such as connection recovery (which can be various ways based on each developer's requirements). 
+
 ## <a id="author"></a>Authors
 - Refinitiv Developer Advocate (https://developers.refinitiv.com/en)
 - Dino Diviacchi (dino.diviacchi@lseg.com)

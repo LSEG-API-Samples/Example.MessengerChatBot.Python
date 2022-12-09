@@ -1,4 +1,4 @@
-certifi==2022.6.15
+certifi==2022.12.7
 charset-normalizer==2.0.12
 idna==3.4
 pip==22.1.2

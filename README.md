@@ -1,6 +1,6 @@
 # Messenger Bot API Demo Applications with Python
-- version: 1.0.4
-- Last update: Sep 2022
+- version: 1.5.0
+- Last update: Oct 2023
 - Environment: Windows
 - Compiler: Python
 - Prerequisite: [Access to Messenger application](#prerequisite)
@@ -51,7 +51,6 @@ Please contact your Refinitiv's representative and Dino Diviacchi (dino.diviacch
 *Note:* 
 - The Python example has been qualified with Python versions 3.9
 - Please refer to the [pip installation guide page](https://pip.pypa.io/en/stable/installing/) if your environment does not have the [pip tool](https://pypi.org/project/pip/) installed. 
-- If your environment already have a websocket-client library installed, you can use ```pip list``` command to verify a library version, then use ```pip install --upgrade websocket-client``` command to upgrade websocket-client library. 
 
 ## <a id="appkey"></a>Getting the AppKey value
 
@@ -99,6 +98,7 @@ Once you have setup your Messenger user and Bot user, you can add the Bot and cr
     - ```bot_username```: Your Bot username
     - ```bot_password```: Your Bot password
     - ```recipient_email``` : Your associate Messenger email address 
+    - ```chatroom_name``` : You chatroom name
 5. OOpen a command prompt and go to folder *src*, then run the demo application with the following command.
     ```
     $>python chatbot_demo_rest.py
@@ -138,6 +138,7 @@ Once you have setup your Messenger user and Bot user, you can add the Bot and cr
     - ```bot_username```: Your Bot username
     - ```bot_password```: Your Bot password
     - ```recipient_email``` : Your associate Messenger email address (For 1 to 1 message)
+    - ```chatroom_name``` : You chatroom name
 5. Open a command prompt and go to folder *src*, then run the demo application with the following command.
     ```
     $>python chatbot_demo_ws.py

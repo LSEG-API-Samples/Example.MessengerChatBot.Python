@@ -29,6 +29,8 @@ bot_password = '---YOUR BOT PASSWORD---'
 app_key = '---YOUR MESSENGER ACCOUNT APPKEY---'
 # Input your Messenger Application account email
 recipient_email = '---YOUR MESSENGER ACCOUNT EMAIL---'
+# Input your Chatroom Name
+chatroom_name = '---YOUR CHAT ROOM NAME---'
 # Setting Log level the supported value is 'logging.INFO' and 'logging.DEBUG'
 log_level = logging.DEBUG
 
@@ -355,8 +357,11 @@ if __name__ == '__main__':
 
     #print(json.dumps(chatroom_respone, sort_keys=True,indent=2, separators=(',', ':')))
 
-    chatroom_id = chatroom_respone['chatrooms'][0]['chatroomId']
-    # print('Chatroom ID is ', chatroom_id)
+    #chatroom_id = chatroom_respone['chatrooms'][0]['chatroomId']
+    for room in chatroom_respone['chatrooms']:
+        if room['name'] == chatroom_name:
+            chatroom_id = room['chatroomId']
+    #print('Chatroom ID is ', chatroom_id)
 
     # Join associated Chatroom
     print('Join Rooms ')
@@ -393,7 +398,7 @@ if __name__ == '__main__':
     #     subprotocols=['messenger-json'])
     # # Event loop
     # wst = threading.Thread(target=web_socket_app.run_forever, kwargs={"sslopt": {"check_hostname": False}, "ping_interval": 60, "ping_timeout": 10, "ping_payload": "2"})
-
+    wst.daemon = True
     wst.start()
 
     try:
